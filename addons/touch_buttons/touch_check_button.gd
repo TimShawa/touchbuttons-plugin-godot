@@ -5,7 +5,7 @@ class_name TouchCheckButton extends TouchButton
 func _init():
 	toggle_mode = true
 	alignment = HORIZONTAL_ALIGNMENT_LEFT
-	_theme_type = "SwitchTouchButton"
+	_theme_type = "TouchCheckButton"
 
 
 func _ready() -> void:
@@ -29,10 +29,7 @@ func _draw() -> void:
 		return
 	
 	_update_controls_size()
-	
-	if !is_instance_valid(theme):
-		set_theme(preload("res://addons/touch_buttons/buttons.theme"))
-	
+		
 	_n_panel().self_modulate = Color.TRANSPARENT if flat else Color.WHITE
 	
 	_n_hbox().add_theme_constant_override("separation", _get_button_constant("h_separation", _theme_type))
@@ -84,9 +81,16 @@ func _draw() -> void:
 
 
 func _get_minimum_size() -> Vector2:
-	if !is_instance_valid(_n_check()): return Vector2.ZERO
 	var size = await super()
+	if !is_instance_valid(_n_check()): return size
+	
+	var stylebox: StyleBox = _n_panel().get_theme_stylebox("panel","PanelContainer")
+	var border := stylebox.content_margin_top + stylebox.content_margin_bottom
+	
 	size.x += _n_check().size.x
+	size.y = max( size.y - border, _n_check().texture.get_size().y) + border
+	
 	if _n_icon().visible or !text.is_empty():
 		size.x += _get_button_constant("h_separation", _theme_type)
+	
 	return size

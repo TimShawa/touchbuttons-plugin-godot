@@ -5,7 +5,7 @@ class_name TouchCheckBox extends TouchButton
 func _init():
 	toggle_mode = true
 	alignment = HORIZONTAL_ALIGNMENT_LEFT
-	_theme_type = "CheckBoxTouchButton"
+	_theme_type = "TouchCheckBox"
 
 
 func _ready() -> void:
@@ -25,14 +25,10 @@ func _n_check() -> TextureRect:
 
 
 func _draw() -> void:
-	
-	if !is_node_ready() or !is_instance_valid(_n_check()):
+	if !is_node_ready() or _n_check() == null:
 		return
 	
 	_update_controls_size()
-	
-	if !is_instance_valid(theme):
-		set_theme(preload("res://addons/touch_buttons/buttons.theme"))
 	
 	_n_panel().self_modulate = Color.TRANSPARENT if flat else Color.WHITE
 	
@@ -65,17 +61,26 @@ func _draw() -> void:
 			_n_icon().size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		VERTICAL_ALIGNMENT_BOTTOM:
 			_n_icon().size_flags_vertical = Control.SIZE_SHRINK_END
-	_n_icon().expand_mode = TextureRect.EXPAND_FIT_HEIGHT if expand_icon else TextureRect.EXPAND_KEEP_SIZE
+	
+	if expand_icon:
+		_n_icon().expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		_n_icon().stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
+	else:
+		_n_icon().expand_mode = TextureRect.EXPAND_KEEP_SIZE
+		_n_icon().stretch_mode = TextureRect.STRETCH_KEEP
 	
 	match get_draw_mode():
 		DrawMode.DRAW_NORMAL:
 			_n_panel().add_theme_stylebox_override("panel", _get_button_stylebox("normal", _theme_type))
+			_n_icon().self_modulate = _get_button_color("icon_normal_color", _theme_type)
 			_n_text().add_theme_color_override("font_color", _get_button_color("font_color", _theme_type))
 		DrawMode.DRAW_PRESSED:
 			_n_panel().add_theme_stylebox_override("panel", _get_button_stylebox("pressed", _theme_type))
+			_n_icon().self_modulate = _get_button_color("icon_pressed_color")
 			_n_text().add_theme_color_override("font_color", _get_button_color("font_pressed_color", _theme_type))
 		DrawMode.DRAW_DISABLED:
 			_n_panel().add_theme_stylebox_override("panel", _get_button_stylebox("disabled", _theme_type))
+			_n_icon().self_modulate = _get_button_color("icon_disabled_color")
 			_n_text().add_theme_color_override("font_color", _get_button_color("font_disabled_color", _theme_type))
 		
 	var item := "checked" if button_pressed else "unchecked"
@@ -87,9 +92,16 @@ func _draw() -> void:
 
 
 func _get_minimum_size() -> Vector2:
-	if !is_instance_valid(_n_check()): return Vector2.ZERO
 	var size = await super()
+	if !is_instance_valid(_n_check()): return Vector2.ZERO
+	
+	var stylebox: StyleBox = _n_panel().get_theme_stylebox("panel","PanelContainer")
+	var border := stylebox.content_margin_top + stylebox.content_margin_bottom
+	
 	size.x += _n_check().size.x
+	size.y = max( size.y - border, _n_check().texture.get_size().y) + border
+	
 	if _n_icon().visible or !text.is_empty():
 		size.x += _get_button_constant("h_separation", _theme_type)
+	
 	return size
