@@ -1,0 +1,23 @@
+icon.svg
+icon.svg.import
+default_env.tres
+addons/explore-editor-theme
+addons/godunity_theme
+addons/post_processing
+project.godot
+project_theme.tres
+
+# Godot 4+ specific ignores
+.godot/
+
+# Godot-specific ignores
+.import/
+export.cfg
+export_presets.cfg
+
+# Imported translations (automatically generated from CSV files)
+*.translation
+
+# Mono-specific ignores
+.mono/
+mono_crash.*.json
