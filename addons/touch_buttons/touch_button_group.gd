@@ -4,9 +4,7 @@ class_name TouchButtonGroup extends Resource
 
 signal pressed(button)
 
-@export
-var allow_unpress := false
-
+@export var allow_unpress := false
 var _buttons := []
 
 

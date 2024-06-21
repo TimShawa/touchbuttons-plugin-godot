@@ -2,31 +2,69 @@
 class_name TouchBaseButton extends Control
 
 
+## Abstract base class for touchscreen GUI buttons.
+## 
+## TouchBaseButton is an abstract base class for touchscreen GUI buttons. It doesn't display anything by itself.
+## Multitouch-support included. Doesn't listen for mouse events, only for screed touches and drag.
+
+## Emitted when the button starts being held down.
 signal button_down
+## Emitted when the button stops being held down.
 signal button_up
+## Emitted when the button is toggled or pressed. This is on [signal button_down] if [member action_mode] is [enum ActionMode.ACTION_MODE_BUTTON_PRESS] and on [signal button_up] otherwise.[br]
+## [br]
+## If you need to know the button's pressed state (and [member toggle_mode] is active), use [signal toggled] instead.
 signal pressed
+## Emitted when the button was just toggled between pressed and normal states (only if [member toggle_mode] is active). The new state is contained in the [param toggled_on] argument.
 signal toggled(toggled_on: bool)
+## Emitted when the button forwards recieved [class InputEventScreenDrag].
 signal drag_input(event)
 
 
-enum ActionMode { ACTION_MODE_BUTTON_PRESS, ACTION_MODE_BUTTON_RELEASE }
-enum DrawMode { DRAW_NORMAL, DRAW_PRESSED, DRAW_DISABLED }
+enum ActionMode {
+	## Require just a press to consider the button clicked.
+	ACTION_MODE_BUTTON_PRESS,
+	## Require a press and a subsequent release before considering the button clicked.
+	ACTION_MODE_BUTTON_RELEASE
+}
+enum DrawMode {
+	## The normal state (i.e. not pressed, not toggled and enabled) of buttons.
+	DRAW_NORMAL,
+	## The state of buttons are pressed.
+	DRAW_PRESSED,
+	## The state of buttons are disabled.
+	DRAW_DISABLED
+}
 
-@export
+## If true, the button is in disabled state and can't be clicked or toggled.
 var disabled := false: set = set_disabled
-@export
+## If true, the button is in toggle mode. Makes the button flip state between pressed and unpressed each time its area is clicked.
 var toggle_mode := false: set = set_toggle_mode
-@export
+## If [code]true[/code], the button's state is pressed. If you want to change the pressed state without emitting signals, use [method set_pressed_no_signal].
 var button_pressed := false: set = set_button_pressed
-@export_enum("Button Press", "Button Release")
+## Determines when the button is considered clicked, one of the [enum ActionMode] constants.
 var action_mode: int = ActionMode.ACTION_MODE_BUTTON_RELEASE
-@export
+## If [code]true[/code], the button is to be pressed only when any finger is in button's clickable area. It will not work when [member toggle_mode] is on.
 var passby_press := false
-@export
+## If [code]true[/code], the button will forward any recieved [class InputEventScreenDrag] with its own [signal drag_input] signal.
 var pass_screen_drag := false
-@export
-var group: TouchButtonGroup: set = set_button_group
+## The [class TouchButtonGroup] associated with the button. Not to be confused with node groups.[br]
+## [br]
+## [b]Note:[/b] The button will be configured as a radio button if a [class TouchButtonGroup] is assigned to it.
+var button_group: TouchButtonGroup: set = set_button_group
 
+func _get_property_list():
+	return [
+		{ name = "disabled", type = TYPE_BOOL },
+		{ name = "toggle_mode", type = TYPE_BOOL },
+		{ name = "button_pressed", type = TYPE_BOOL },
+		{ name = "action_mode", type = TYPE_INT, hint = PROPERTY_HINT_ENUM, hint_string = "Button Press,Button Release" },
+		{ name = "passby_press", type = TYPE_BOOL },
+		{ name = "pass_screen_drag", type = TYPE_BOOL },
+		{ name = "button_group", type = TYPE_OBJECT, hint = PROPERTY_HINT_RESOURCE_TYPE, hint_string = "TouchButtonGroup" }
+	]
+
+## If button was pressed by touch, equals to touch index, -1 otherwise.
 var touch_index := -1
 
 # == Property setters ====
@@ -48,8 +86,8 @@ func set_button_pressed(value):
 		button_pressed = true
 		_emit_pressed()
 	else:
-		if toggle_mode and is_instance_valid(group):
-			if !group.allow_unpress and !value:
+		if toggle_mode and is_instance_valid(button_group):
+			if !button_group.allow_unpress and !value:
 				return
 		button_pressed = false
 		touch_index = -1
@@ -66,16 +104,16 @@ func _emit_pressed():
 	if action_mode == ActionMode.ACTION_MODE_BUTTON_PRESS:
 		emit_signal("pressed")
 	
-	if toggle_mode and is_instance_valid(group):
-		group.emit_signal("pressed", self)
+	if toggle_mode and is_instance_valid(button_group):
+		button_group.emit_signal("pressed", self)
 
 
 func _emit_released():
 	if !button_pressed:
 		return
 	
-	if toggle_mode and is_instance_valid(group):
-		if !group.allow_unpress:
+	if toggle_mode and is_instance_valid(button_group):
+		if !button_group.allow_unpress:
 			return
 	
 	emit_signal("button_up")
@@ -84,22 +122,22 @@ func _emit_released():
 	if action_mode == ActionMode.ACTION_MODE_BUTTON_PRESS:
 		emit_signal("pressed")
 		
-	if toggle_mode and is_instance_valid(group):
-		group.emit_signal("pressed", null)
+	if toggle_mode and is_instance_valid(button_group):
+		button_group.emit_signal("pressed", null)
 
 
 func set_button_group(value):
-	if group == value:
+	if button_group == value:
 		return
-	if is_instance_valid(group):
-		group._buttons.erase(self)
-		group.pressed.disconnect(_on_group_button_pressed)
-	group = value
+	if is_instance_valid(button_group):
+		button_group._buttons.erase(self)
+		button_group.pressed.disconnect(_on_group_button_pressed)
+	button_group = value
 	if is_instance_valid(value):
-		if !(self in group._buttons):
-			group._buttons.push_back(self)
-			if !group.pressed.is_connected(_on_group_button_pressed):
-				group.pressed.connect(_on_group_button_pressed)
+		if !(self in button_group._buttons):
+			button_group._buttons.push_back(self)
+			if !button_group.pressed.is_connected(_on_group_button_pressed):
+				button_group.pressed.connect(_on_group_button_pressed)
 	update_configuration_warnings()
 
 
@@ -178,6 +216,8 @@ func _input(event: InputEvent) -> void:
 									self.button_pressed = true
 
 
+## Returns the visual state used to draw the button. This is useful mainly when implementing your own draw code by either overriding [method _draw] or connecting to "draw" signal.
+## The visual state of the button is defined by the [enum DrawMode] enum.
 func get_draw_mode() -> int:
 	if disabled:
 		return DrawMode.DRAW_DISABLED
@@ -186,11 +226,17 @@ func get_draw_mode() -> int:
 	return DrawMode.DRAW_NORMAL
 
 
+## Changes the button_pressed state of the button, without emitting [signal toggled].
+## Use when you just want to change the state of the button without sending the pressed event (e.g. when initializing scene).
 func set_pressed_no_signal(p_pressed: bool) -> void:
 	self.button_pressed = p_pressed
 
 
+## Called when the button is pressed. If you need to know the button's pressed state (and [member toggle_mode] is active), use [method _toggled] instead.
 func _pressed() -> void: pass
+
+
+## Called when the button is toggled (only if [member toggle_mode] is active).
 func _toggled(toggled_on: bool) -> void: pass
 
 
@@ -205,12 +251,14 @@ func _in_rect(point: Vector2, global := true):
 
 
 func _get_configuration_warning():
-	if is_instance_valid(group) and !toggle_mode:
+	if is_instance_valid(button_group) and !toggle_mode:
 		return tr("ButtonGroup is intended to be used only with buttons that have toggle_mode set to true.")
 	return ""
 
+
 var _redraw_timer := 0.0
 const _REDRAW_FRAMES = 10
+
 
 func _process(delta: float) -> void:
 	_redraw_timer += delta

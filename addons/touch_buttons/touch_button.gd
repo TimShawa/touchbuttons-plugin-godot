@@ -2,36 +2,86 @@
 class_name TouchButton extends TouchBaseButton
 
 
-@export_multiline
-var text := "": set = set_text
-@export
-var icon: Texture: set = set_icon
-@export
-var flat := false: set = set_flat
+## A themed button that can contain text and an icon.
+## 
+## [b]TouchButton[/b] is the standard themed touchscreen button. It can contain text and an icon, and it will display them according to the current [class Theme].[br]
+## 
+## [b]Example of creating a button and assigning an action when pressed by code:[/b]
+## [codeblock]
+## func _ready():
+##     var button = Button.new()
+##     button.text = "Click me"
+##     button.pressed.connect(self._button_pressed)
+##     add_child(button)
+## 
+## func _button_pressed():
+##     print("Hello world!")
+## [/codeblock]
+## See also BaseButton which contains common properties and methods associated with this node.[br]
+## [br]
+## TouchButtons ACTUALLY interpret touch input and support multitouch, unlike built-in [class Button]s, and ignore mouse/shortcuts.
+## Therefore there are not FOCUSED, HOVERED and HOVERED_PRESSED states.[br]
+## [br]
+## To change button appearance attach [class Theme] resourse to the node and modify its parameters. Also custom [member theme_type_variation] will be used, if specified.
+## Theme properties and default values can be found at [code]res://addons/touch_buttons/buttons.theme[/code].
 
-@export_group("Text Behavior")
-@export_enum("Left", "Center", "Right")
+
+## The button's text that will be displayed inside the button's area.
+var text := "": set = set_text
+## Button's icon, if text is present the icon will be placed before the text.[br]
+## To edit margin and spacing of the icon, use [theme_item h_separation] theme property and [code]content_margin_*[/code] properties of the used [class StyleBox]es.
+var icon: Texture: set = set_icon
+## Flat buttons don't display decoration.
+var flat := false: set = set_flat
+# Text Behavior
+## Text alignment policy for the button's text, use one of the [enum HorizontalAlignment] constants.
 var alignment: int = HORIZONTAL_ALIGNMENT_CENTER: set = set_alignment
-@export_enum("Trim Nothing", "Trim Characters", "Trim Words", "Elipsis", "Word Elipsis")
-var text_overrun_behavior: int = TextServer.OVERRUN_NO_TRIM: set = set_text_overrun_behavior
-@export_enum("Off", "Arbitrary", "Word", "Word (Smart)")
+## Sets the clipping behavior when the text exceeds the node's bounding rectangle. See [enum TextServer.OverrunBehavior] for a description of all modes.
+var text_overrun_behavior: int = TextServer.OVERRUN_NO_TRIMMING: set = set_text_overrun_behavior
+## If set to something other than [constant TextServer.AUTOWRAP_OFF], the text gets wrapped inside the node's bounding rectangle.
 var autowrap_mode: int = TextServer.AUTOWRAP_OFF: set = set_autowrap_mode
-@export
+## When this property is enabled, text that is too large to fit the button is clipped, when disabled the TouchButton will always be wide enough to hold the text.
 var clip_text := false: set = set_clip_text
 
-@export_group("Icon Behavior")
-@export_enum("Left", "Center", "Right")
-var icon_alignment: int = HORIZONTAL_ALIGNMENT_LEFT: set = set_icon_alignment
-@export_enum("Top", "Center", "Bottom")
-var vertical_icon_alignment: int = VERTICAL_ALIGNMENT_CENTER: set = set_vertical_icon_alignment
-@export
-var expand_icon := false: set = set_expand_icon
-
-@export_group("BiDi")
-@export_enum("Auto", "Left-to-Right", "Right-to-Left", "Inherited")
-var text_direction: int = TextServer.DIRECTION_AUTO: set = set_text_direction
-@export_custom(PROPERTY_HINT_LOCALE_ID, "")
+# Icon Behavior
+## Specifies if the icon should be aligned horizontally to the left, right, or center of a button.
+## Uses the same [enum HorizontalAlignment] constants as the text alignment.
+## If centered horizontally and vertically, text will draw on top of the icon.
+var icon_alignment := HORIZONTAL_ALIGNMENT_LEFT: set = set_icon_alignment
+## Specifies if the icon should be aligned vertically to the top, bottom, or center of a button.
+## Uses the same [enum VerticalAlignment] constants as the text alignment.
+## If centered horizontally and vertically, text will draw on top of the icon.
+var vertical_icon_alignment := VERTICAL_ALIGNMENT_CENTER: set = set_vertical_icon_alignment
+## When enabled, the button's icon will expand/shrink to fit the button's size while keeping its aspect.
+var expand_icon := false: set = set_expand_icon # See also [theme_item icon_max_width]. TODO
+## Base text writing direction.
+var text_direction := TextServer.DIRECTION_AUTO: set = set_text_direction
+## Language code used for line-breaking and text shaping algorithms, if left empty current locale is used instead.
 var language := "": set = set_language
+
+
+func _get_property_list():
+	return [
+		{ name = "text", type = TYPE_STRING, hint = PROPERTY_HINT_MULTILINE_TEXT },
+		{ name = "icon", type = TYPE_OBJECT, hint = PROPERTY_HINT_RESOURCE_TYPE, hint_string = "Texture" },
+		{ name = "flat", type = TYPE_BOOL },
+		
+		{ name = "Text Behavior", type = TYPE_NIL, usage = PROPERTY_USAGE_GROUP },
+		{ name = "alignment", type = TYPE_INT, hint = PROPERTY_HINT_ENUM, hint_string = "Left,Center,Right" },
+		{ name = "text_overrun_behavior", type = TYPE_INT, hint = PROPERTY_HINT_ENUM, hint_string = "Trim Nothing,Trim Characters,Trim Words,Elipsis,Word Elipsis" },
+		{ name = "autowrap_mode", type = TYPE_INT, hint = PROPERTY_HINT_ENUM, hint_string = "Off,Arbitrary,Word,Word (Smart)" },
+		{ name = "clip_text", type = TYPE_BOOL },
+		
+		{ name = "Icon Behavior", type = TYPE_NIL, usage = PROPERTY_USAGE_GROUP },
+		{ name = "icon_alignment", type = TYPE_INT, hint = PROPERTY_HINT_ENUM, hint_string = "Left,Center,Right" },
+		{ name = "vertical_icon_alignment", type = TYPE_INT, hint = PROPERTY_HINT_ENUM, hint_string = "Top,Center,Bottom" },
+		{ name = "expand_icon", type = TYPE_BOOL },
+		
+		{ name = "BiDi", type = TYPE_NIL, usage = PROPERTY_USAGE_GROUP },
+		{ name = "text_direction", type = TYPE_INT, hint = PROPERTY_HINT_ENUM, hint_string = "Auto,Left-to-Right,Right-to-Left,Inherited" },
+		{ name = "language", type = TYPE_STRING, hint = PROPERTY_HINT_LOCALE_ID }
+	]
+
 
 var _theme_type := "TouchButton"
 var _buttons_theme = load("res://addons/touch_buttons/buttons.theme")
@@ -97,7 +147,7 @@ func _draw() -> void:
 	_n_text().text_overrun_behavior = self.text_overrun_behavior
 	_n_text().autowrap_mode = self.autowrap_mode
 	_n_text().clip_text = self.clip_text
-	_n_text().text_direction = self.text_direction
+	_n_text().text_direction = self.text_direction as TextDirection
 	_n_text().language = self.language
 	
 	if is_instance_valid(icon):

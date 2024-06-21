@@ -42,7 +42,7 @@ func _draw() -> void:
 	_n_text().text_overrun_behavior = self.text_overrun_behavior
 	_n_text().autowrap_mode = self.autowrap_mode
 	_n_text().clip_text = self.clip_text
-	_n_text().text_direction = self.text_direction
+	_n_text().text_direction = self.text_direction as TextDirection
 	_n_text().language = self.language
 	
 	if is_instance_valid(icon):
@@ -82,7 +82,10 @@ func _draw() -> void:
 
 func _get_minimum_size() -> Vector2:
 	var size = await super()
-	if !is_instance_valid(_n_check()): return size
+	if !is_instance_valid(_n_check()):
+		return size
+	if _n_check().texture == null:
+		return size
 	
 	var stylebox: StyleBox = _n_panel().get_theme_stylebox("panel","PanelContainer")
 	var border := stylebox.content_margin_top + stylebox.content_margin_bottom

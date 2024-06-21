@@ -7,7 +7,7 @@ This plugin for Godot Engine 4.1+ adds TouchBaseButton class and its subclasses.
 
 Most of buttons functionality can be found in the native Buttons docs. There is some additional options:
 - (when `toggle_mode` is `true`) Pass-by Press: Button become pressed when finger enters its pressable area and become released when finger exits.
-- (when `toggle_mode` is `true`) Pass Screen Drag: Button forwards any recieved screen drag input event with `drag_input` signal.
+- Pass Screen Drag: Button forwards any recieved screen drag input event with `drag_input` signal.
 - TouchButtons use **TouchButtonGroup**s instead of native ButtonGroup resource, because ButtonGroups support only built-in Buttons.
 
 ## Change appearance

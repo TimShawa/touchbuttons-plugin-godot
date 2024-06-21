@@ -12,17 +12,29 @@ enum StretchMode {
 	STRETCH_KEEP_ASPECT_COVERED
 }
 
-@export var ignore_texture_size := false: set = set_ignore_texture_size
-@export_enum("Scale", "Tile", "Keep", "Keep Centered", "Keep Aspect", "Keep Aspect Centered", "Keep Aspect Covered") \
-	var stretch_mode: int = StretchMode.STRETCH_KEEP
-@export var flip_h := false
-@export var flip_v := false
+var ignore_texture_size := false: set = set_ignore_texture_size
+var stretch_mode := StretchMode.STRETCH_KEEP
+var flip_h := false
+var flip_v := false
 
-@export_group("Textures")
-@export var texture_normal: Texture: set = set_texture_normal
-@export var texture_pressed: Texture: set = set_texture_pressed
-@export var texture_disabled: Texture: set = set_texture_disabled
-@export var texture_click_mask: BitMap: set = set_texture_click_mask
+var texture_normal: Texture2D: set = set_texture_normal
+var texture_pressed: Texture2D: set = set_texture_pressed
+var texture_disabled: Texture2D: set = set_texture_disabled
+var texture_click_mask: BitMap: set = set_texture_click_mask
+
+
+func _get_property_list():
+	return [
+		{ name = "ignore_texture_size", type = TYPE_BOOL },
+		{ name = "stretch_mode", type = TYPE_INT, hint = PROPERTY_HINT_ENUM, hint_string = "Scale,Tile,Keep,Keep Centered,Keep Aspect,Keep Aspect Centered,Keep Aspect Covered" },
+		{ name = "flip_h", type = TYPE_BOOL },
+		{ name = "flip_v", type = TYPE_BOOL },
+		{ name = "Textures", type = TYPE_NIL, usage = PROPERTY_USAGE_GROUP },
+		{ name = "texture_normal", type = TYPE_OBJECT, hint = PROPERTY_HINT_RESOURCE_TYPE, hint_string = "Texture2D" },
+		{ name = "texture_pressed", type = TYPE_OBJECT, hint = PROPERTY_HINT_RESOURCE_TYPE, hint_string = "Texture2D" },
+		{ name = "texture_disabled", type = TYPE_OBJECT, hint = PROPERTY_HINT_RESOURCE_TYPE, hint_string = "Texture2D" },
+		{ name = "texture_click_mask", type = TYPE_OBJECT, hint = PROPERTY_HINT_RESOURCE_TYPE, hint_string = "BitMap" }
+	]
 
 
 var _texture_region := Rect2()
