@@ -56,11 +56,11 @@ var action_mode: int = ActionMode.ACTION_MODE_BUTTON_RELEASE:
 
 ## If [code]true[/code], the button is to be pressed only when any finger is in button's clickable area. It will not work when [member toggle_mode] is on.
 var passby_press := false:
-	set = set_passby_press, get = is_passby_press
+	set = set_passby_press, get = get_passby_press
 
 ## If [code]true[/code], the button will forward any recieved [class InputEventScreenDrag] with its own [signal drag_input] signal.
 var pass_screen_drag := false:
-	set = set_pass_screen_drag, get = is_pass_screen_drag
+	set = set_pass_screen_drag, get = get_pass_screen_drag
 
 ## The [class TouchButtonGroup] associated with the button. Not to be confused with node groups.[br]
 ## [br]
@@ -176,8 +176,8 @@ func is_disabled(): return disabled
 func is_toggle_mode(): return toggle_mode
 func is_button_pressed(): return button_pressed
 func get_action_mode(): return action_mode
-func is_passby_press(): return passby_press
-func is_pass_screen_drag(): return pass_screen_drag
+func get_passby_press(): return passby_press
+func get_pass_screen_drag(): return pass_screen_drag
 func get_button_group(): return button_group
 
 #endregion
