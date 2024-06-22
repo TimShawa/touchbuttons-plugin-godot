@@ -4,7 +4,7 @@ class_name TouchButton extends TouchBaseButton
 
 ## A themed button that can contain text and an icon.
 ## 
-## [b]TouchButton[/b] is the standard themed touchscreen button. It can contain text and an icon, and it will display them according to the current [class Theme].[br]
+## [TouchButton] is the standard themed touchscreen button. It can contain text and an icon, and it will display them according to the current [Theme].[br]
 ## 
 ## [b]Example of creating a button and assigning an action when pressed by code:[/b]
 ## [codeblock]
@@ -17,47 +17,71 @@ class_name TouchButton extends TouchBaseButton
 ## func _button_pressed():
 ##     print("Hello world!")
 ## [/codeblock]
-## See also BaseButton which contains common properties and methods associated with this node.[br]
+## See also [TouchBaseButton] which contains common properties and methods associated with this node.[br]
 ## [br]
-## TouchButtons ACTUALLY interpret touch input and support multitouch, unlike built-in [class Button]s, and ignore mouse/shortcuts.
+## [TouchButton]s ACTUALLY interpret touch input and support multitouch, unlike built-in [Button]s, and ignore mouse/shortcuts.
 ## Therefore there are not FOCUSED, HOVERED and HOVERED_PRESSED states.[br]
 ## [br]
-## To change button appearance attach [class Theme] resourse to the node and modify its parameters. Also custom [member theme_type_variation] will be used, if specified.
-## Theme properties and default values can be found at [code]res://addons/touch_buttons/buttons.theme[/code].
-
+## To change button appearance attach [Theme] resourse to the node and modify its parameters. Also custom [member theme_type_variation] will be used, if specified.
+## Theme properties and default values can be found at [code]res://addons/touch_buttons/buttons.theme[/code].[br]
+## [br]
+## [i]Touchscreen equivalent of buiilt-in [Button].[/i]
 
 ## The button's text that will be displayed inside the button's area.
-var text := "": set = set_text
+var text := "":
+	set = set_text, get = get_text
+
 ## Button's icon, if text is present the icon will be placed before the text.[br]
-## To edit margin and spacing of the icon, use [theme_item h_separation] theme property and [code]content_margin_*[/code] properties of the used [class StyleBox]es.
-var icon: Texture: set = set_icon
+## To edit margin and spacing of the icon, use [theme_item h_separation] theme property and [code]content_margin_*[/code] properties of the used [StyleBox]es.
+var icon: Texture:
+	set = set_icon, get = get_icon
+
 ## Flat buttons don't display decoration.
-var flat := false: set = set_flat
+var flat := false:
+	set = set_flat, get = is_flat
+
 # Text Behavior
+
 ## Text alignment policy for the button's text, use one of the [enum HorizontalAlignment] constants.
-var alignment: int = HORIZONTAL_ALIGNMENT_CENTER: set = set_alignment
+var alignment: int = HORIZONTAL_ALIGNMENT_CENTER:
+	set = set_alignment, get = get_alignment
+
 ## Sets the clipping behavior when the text exceeds the node's bounding rectangle. See [enum TextServer.OverrunBehavior] for a description of all modes.
-var text_overrun_behavior: int = TextServer.OVERRUN_NO_TRIMMING: set = set_text_overrun_behavior
+var text_overrun_behavior: int = TextServer.OVERRUN_NO_TRIMMING:
+	set = set_text_overrun_behavior, get = get_text_overrun_behavior
+
 ## If set to something other than [constant TextServer.AUTOWRAP_OFF], the text gets wrapped inside the node's bounding rectangle.
-var autowrap_mode: int = TextServer.AUTOWRAP_OFF: set = set_autowrap_mode
-## When this property is enabled, text that is too large to fit the button is clipped, when disabled the TouchButton will always be wide enough to hold the text.
-var clip_text := false: set = set_clip_text
+var autowrap_mode: int = TextServer.AUTOWRAP_OFF:
+	set = set_autowrap_mode, get = get_autowrap_mode
+
+## When this property is enabled, text that is too large to fit the button is clipped, when disabled the [TouchButton] will always be wide enough to hold the text.
+var clip_text := false:
+	set = set_clip_text, get = get_clip_text
 
 # Icon Behavior
 ## Specifies if the icon should be aligned horizontally to the left, right, or center of a button.
 ## Uses the same [enum HorizontalAlignment] constants as the text alignment.
 ## If centered horizontally and vertically, text will draw on top of the icon.
-var icon_alignment := HORIZONTAL_ALIGNMENT_LEFT: set = set_icon_alignment
+var icon_alignment := HORIZONTAL_ALIGNMENT_LEFT:
+	set = set_icon_alignment, get = get_icon_alignment
+
 ## Specifies if the icon should be aligned vertically to the top, bottom, or center of a button.
 ## Uses the same [enum VerticalAlignment] constants as the text alignment.
 ## If centered horizontally and vertically, text will draw on top of the icon.
-var vertical_icon_alignment := VERTICAL_ALIGNMENT_CENTER: set = set_vertical_icon_alignment
+var vertical_icon_alignment := VERTICAL_ALIGNMENT_CENTER:
+	set = set_vertical_icon_alignment, get = get_vertical_icon_alignment
+
 ## When enabled, the button's icon will expand/shrink to fit the button's size while keeping its aspect.
-var expand_icon := false: set = set_expand_icon # See also [theme_item icon_max_width]. TODO
+var expand_icon := false:
+	set = set_expand_icon, get = is_expand_icon # See also [theme_item icon_max_width]. TODO
+
 ## Base text writing direction.
-var text_direction := TextServer.DIRECTION_AUTO: set = set_text_direction
+var text_direction := TextServer.DIRECTION_AUTO:
+	set = set_text_direction, get = get_text_diraction
+
 ## Language code used for line-breaking and text shaping algorithms, if left empty current locale is used instead.
-var language := "": set = set_language
+var language := "":
+	set = set_language, get = get_language
 
 
 func _get_property_list():
@@ -86,7 +110,8 @@ func _get_property_list():
 var _theme_type := "TouchButton"
 var _buttons_theme = load("res://addons/touch_buttons/buttons.theme")
 
-# == Property Setters ====
+
+#region SETGET
 
 func set_text(value): text = value; queue_redraw()
 func set_icon(value): icon = value; queue_redraw()
@@ -97,15 +122,30 @@ func set_autowrap_mode(value): autowrap_mode = value; queue_redraw()
 func set_clip_text(value): clip_text = value; queue_redraw()
 func set_icon_alignment(value): icon_alignment = value; queue_redraw()
 func set_vertical_icon_alignment(value): vertical_icon_alignment = value; queue_redraw()
-func set_text_direction(value): text_direction = value; queue_redraw()
-func set_language(value): language = value; queue_redraw()
 
 func set_expand_icon(value):
 	expand_icon = value;
 	size = get_combined_minimum_size().max(size)
 	queue_redraw()
 
-# ========================'1
+func set_text_direction(value): text_direction = value; queue_redraw()
+func set_language(value): language = value; queue_redraw()
+
+
+func get_text(): return text
+func get_icon(): return icon
+func is_flat(): return flat
+func get_alignment(): return alignment
+func get_text_overrun_behavior(): return text_overrun_behavior
+func get_autowrap_mode(): return autowrap_mode
+func get_clip_text(): return clip_text
+func get_icon_alignment(): return icon_alignment
+func get_vertical_icon_alignment(): return vertical_icon_alignment
+func is_expand_icon(): return expand_icon
+func get_text_diraction(): return text_direction
+func get_language(): return language
+
+#endregion
 
 
 func _ready() -> void:

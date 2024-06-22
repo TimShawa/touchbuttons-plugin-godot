@@ -2,25 +2,69 @@
 class_name TouchTextureButton extends TouchBaseButton
 
 
+## Texture-based touchscreen button. Supports Pressed, and Disabled states.
+## 
+## [TouchTextureButton] has the same functionality as [TouchButton], except it uses sprites instead of Godot's [Theme] resource.
+## It is faster to create, but it doesn't support localization like more complex [Control]s. It also support multitouch input.[br]
+## [br]
+## The "normal" state must contain a texture ([member texture_normal]); other textures are optional.[br]
+## [br]
+## See also [TouchBaseButton] which contains common properties and methods associated with this node.[br]
+## [br]
+## [i]Touchscreen equivalent of built-in [TextureButton].[/i]
+
+
 enum StretchMode {
+	## Scale to fit the node's bounding rectangle.
 	STRETCH_SCALE,
+	## Tile inside the node's bounding rectangle.
 	STRETCH_TILE,
+	## The texture keeps its original size and stays in the bounding rectangle's top-left corner.
 	STRETCH_KEEP,
+	## The texture keeps its original size and stays centered in the node's bounding rectangle
 	STRETCH_KEEP_CENTERED,
+	## Scale the texture to fit the node's bounding rectangle, but maintain the texture's aspect ratio.
 	STRETCH_KEEP_ASPECT,
+	## Scale the texture to fit the node's bounding rectangle, center it, and maintain its aspect ratio.
 	STRETCH_KEEP_ASPECT_CENTERED,
+	## Scale the texture so that the shorter side fits the bounding rectangle. The other side clips to the node's limits.
 	STRETCH_KEEP_ASPECT_COVERED
 }
 
-var ignore_texture_size := false: set = set_ignore_texture_size
-var stretch_mode := StretchMode.STRETCH_KEEP
-var flip_h := false
-var flip_v := false
 
-var texture_normal: Texture2D: set = set_texture_normal
-var texture_pressed: Texture2D: set = set_texture_pressed
-var texture_disabled: Texture2D: set = set_texture_disabled
-var texture_click_mask: BitMap: set = set_texture_click_mask
+## If [code]true[/code], the size of the texture won't be considered for minimum size calculation, so the [TouchTextureButton] can be shrunk down past the texture size.
+var ignore_texture_size := false:
+	set = set_ignore_texture_size, get = get_ignore_texture_size
+
+## Controls the texture's behavior when you resize the node's bounding rectangle. See the [enum StretchMode] constants for available options.
+var stretch_mode := StretchMode.STRETCH_KEEP:
+	set = set_stretch_mode, get = get_stretch_mode
+
+## If [code]true[/code], texture is flipped horizontally.
+var flip_h := false:
+	set = set_flip_h, get = is_fliped_h
+
+## If [code]true[/code], texture is flipped vertically.
+var flip_v := false:
+	set = set_flip_v, get = is_fliped_v
+
+
+## Texture to display by default, when the node is [b]not[/b] in the disabled or pressed state.
+var texture_normal: Texture2D:
+	set = set_texture_normal, get = get_texture_normal
+
+## Texture to display when the node is pressed.
+var texture_pressed: Texture2D:
+	set = set_texture_pressed, get = get_texture_pressed
+
+## Texture to display when the node is disabled. See [memeber BaseButton.disabled].
+var texture_disabled: Texture2D:
+	set = set_texture_disabled, get = get_texture_disabled
+
+## Pure black and white [BitMap] image to use for click detection.
+## On the mask, white pixels represent the button's clickable area. Use it to create buttons with curved shapes.
+var texture_click_mask: BitMap:
+	set = set_texture_click_mask, get = get_texture_click_mask
 
 
 func _get_property_list():
@@ -42,11 +86,20 @@ var _position_rect := Rect2()
 var _tile := false
 
 
-# == Property Setters ====
+#region SETGET
 
 func set_ignore_texture_size(value):
 	ignore_texture_size = value
 	update_minimum_size()
+
+
+func set_stretch_mode(value): stretch_mode = value
+
+
+func set_flip_h(value): flip_h = value
+
+
+func set_flip_v(value): flip_v = value
 
 
 func set_texture_normal(value):
@@ -68,7 +121,17 @@ func set_texture_click_mask(value):
 	texture_click_mask = value
 	_texture_changed()
 
-# ==============
+
+func get_ignore_texture_size(): return ignore_texture_size
+func get_stretch_mode(): return stretch_mode
+func is_fliped_h(): return flip_h
+func is_fliped_v(): return flip_v
+func get_texture_normal(): return texture_normal
+func get_texture_pressed(): return texture_pressed
+func get_texture_disabled(): return texture_disabled
+func get_texture_click_mask(): return texture_click_mask
+
+#endregion
 
 
 func _notification(p_what: int) -> void:
@@ -178,7 +241,7 @@ func _get_minimum_size():
 	return rscale.abs()
 
 
-func has_point(p_point: Vector2):
+func _has_point(p_point: Vector2):
 	if is_instance_valid(texture_click_mask):
 		var point := p_point
 		var rect: Rect2

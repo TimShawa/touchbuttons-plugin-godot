@@ -2,6 +2,17 @@
 class_name TouchCheckButton extends TouchButton
 
 
+## A touchscreen button that represents a binary choice.
+## 
+## [TouchCheckButton] is a toggle button displayed as a check field, multitouch-support included. It's similar to [TouchCheckBox] in functionality, but it has a different appearance.
+## To follow established UX patterns, it's recommended to use [TouchCheckButton] when toggling it has an [b]immediate[/b] effect on something.
+## For example, it can be used when pressing it shows or hides advanced settings, without asking the user to confirm this action.[br]
+## [br]
+## See also [TouchBaseButton] which contains common properties and methods associated with this node.[br]
+## [br]
+## [i]Touchscreen equivalent of buiilt-in [CheckButton].[/i]
+
+
 func _init():
 	toggle_mode = true
 	alignment = HORIZONTAL_ALIGNMENT_LEFT

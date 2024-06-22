@@ -2,10 +2,12 @@
 class_name TouchBaseButton extends Control
 
 
-## Abstract base class for touchscreen GUI buttons.
+## A base class for touchscreen GUI buttons.
 ## 
-## TouchBaseButton is an abstract base class for touchscreen GUI buttons. It doesn't display anything by itself.
-## Multitouch-support included. Doesn't listen for mouse events, only for screed touches and drag.
+## TouchBaseButton is base class for touchscreen GUI buttons. It doesn't display anything by itself.
+## Multitouch-support included. Doesn't listen for mouse events, only for screed touches and drag.[br]
+## [br]
+## [i]Touchscreen equivalent of buiilt-in [BaseButton].[/i]
 
 ## Emitted when the button starts being held down.
 signal button_down
@@ -37,21 +39,35 @@ enum DrawMode {
 }
 
 ## If true, the button is in disabled state and can't be clicked or toggled.
-var disabled := false: set = set_disabled
+var disabled := false:
+	set = set_disabled, get = is_disabled
+
 ## If true, the button is in toggle mode. Makes the button flip state between pressed and unpressed each time its area is clicked.
-var toggle_mode := false: set = set_toggle_mode
+var toggle_mode := false:
+	set = set_toggle_mode, get = is_toggle_mode
+
 ## If [code]true[/code], the button's state is pressed. If you want to change the pressed state without emitting signals, use [method set_pressed_no_signal].
-var button_pressed := false: set = set_button_pressed
+var button_pressed := false:
+	set = set_button_pressed, get = is_button_pressed
+
 ## Determines when the button is considered clicked, one of the [enum ActionMode] constants.
-var action_mode: int = ActionMode.ACTION_MODE_BUTTON_RELEASE
+var action_mode: int = ActionMode.ACTION_MODE_BUTTON_RELEASE:
+	set = set_action_mode, get = get_action_mode
+
 ## If [code]true[/code], the button is to be pressed only when any finger is in button's clickable area. It will not work when [member toggle_mode] is on.
-var passby_press := false
+var passby_press := false:
+	set = set_passby_press, get = is_passby_press
+
 ## If [code]true[/code], the button will forward any recieved [class InputEventScreenDrag] with its own [signal drag_input] signal.
-var pass_screen_drag := false
+var pass_screen_drag := false:
+	set = set_pass_screen_drag, get = is_pass_screen_drag
+
 ## The [class TouchButtonGroup] associated with the button. Not to be confused with node groups.[br]
 ## [br]
 ## [b]Note:[/b] The button will be configured as a radio button if a [class TouchButtonGroup] is assigned to it.
-var button_group: TouchButtonGroup: set = set_button_group
+var button_group: TouchButtonGroup:
+	set = set_button_group, get = get_button_group
+
 
 func _get_property_list():
 	return [
@@ -64,10 +80,11 @@ func _get_property_list():
 		{ name = "button_group", type = TYPE_OBJECT, hint = PROPERTY_HINT_RESOURCE_TYPE, hint_string = "TouchButtonGroup" }
 	]
 
-## If button was pressed by touch, equals to touch index, -1 otherwise.
-var touch_index := -1
 
-# == Property setters ====
+var _touch_index := -1
+
+
+#region Property setters
 
 func set_toggle_mode(value):
 	toggle_mode = value
@@ -90,8 +107,11 @@ func set_button_pressed(value):
 			if !button_group.allow_unpress and !value:
 				return
 		button_pressed = false
-		touch_index = -1
+		_touch_index = -1
 		_emit_released()
+
+
+func set_action_mode(value): action_mode = value
 
 
 func _emit_pressed():
@@ -126,6 +146,12 @@ func _emit_released():
 		button_group.emit_signal("pressed", null)
 
 
+func set_passby_press(value): passby_press = value
+
+
+func set_pass_screen_drag(value): pass_screen_drag = value
+
+
 func set_button_group(value):
 	if button_group == value:
 		return
@@ -145,7 +171,16 @@ func _on_group_button_pressed(button: TouchBaseButton):
 	if button != self:
 		set_pressed_no_signal(false)
 
-# ========================
+
+func is_disabled(): return disabled
+func is_toggle_mode(): return toggle_mode
+func is_button_pressed(): return button_pressed
+func get_action_mode(): return action_mode
+func is_passby_press(): return passby_press
+func is_pass_screen_drag(): return pass_screen_drag
+func get_button_group(): return button_group
+
+#endregion
 
 
 func _init() -> void:
@@ -167,17 +202,17 @@ func _input(event: InputEvent) -> void:
 				if event.pressed:
 					if _in_rect(event.position):
 						if !button_pressed:
-							touch_index = event.index
-						if event.index == touch_index:
+							_touch_index = event.index
+						if event.index == _touch_index:
 							self.button_pressed = true
 #						else:
 #							self.button_pressed = false
-				if touch_index == event.index and !event.pressed:
+				if _touch_index == event.index and !event.pressed:
 					self.button_pressed = false
 			# Pass drag events to, as examle, look controller panel
 			if pass_screen_drag:
 				if event is InputEventScreenDrag:
-					if button_pressed and event.index == touch_index:
+					if button_pressed and event.index == _touch_index:
 						emit_signal("drag_input", event)
 		# PASS-BY
 		elif !toggle_mode and passby_press:
@@ -186,20 +221,20 @@ func _input(event: InputEvent) -> void:
 				if event.is_pressed() and !event.is_echo():
 					if _in_rect(event.position):
 						if !button_pressed:
-							touch_index = event.index
-						if event.index == touch_index:
+							_touch_index = event.index
+						if event.index == _touch_index:
 							self.button_pressed = true
 						else:
 							self.button_pressed = false
-				if event.is_released() and event.index == touch_index:
+				if event.is_released() and event.index == _touch_index:
 					self.button_pressed = false
 			# Drag
 			if event is InputEventScreenDrag:
 				if !button_pressed:
 					if _in_rect(event.position):
 						self.button_pressed = true
-						touch_index = event.index
-				elif event.index == touch_index:
+						_touch_index = event.index
+				elif event.index == _touch_index:
 					if !_in_rect(event.position):
 						self.button_pressed = false
 		# TOGGLE
@@ -208,12 +243,17 @@ func _input(event: InputEvent) -> void:
 					if event.is_pressed():
 						if _in_rect(event.position):
 							if !button_pressed:
-								touch_index = event.index
-							if event.index == touch_index:
+								_touch_index = event.index
+							if event.index == _touch_index:
 								if button_pressed:
 									self.button_pressed = false
 								else:
 									self.button_pressed = true
+
+
+## If button was pressed by touch, returns the touch index, -1 otherwise.
+func get_touch_index():
+	return _touch_index
 
 
 ## Returns the visual state used to draw the button. This is useful mainly when implementing your own draw code by either overriding [method _draw] or connecting to "draw" signal.
