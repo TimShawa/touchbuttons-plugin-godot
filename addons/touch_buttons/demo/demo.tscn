@@ -164,7 +164,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme = ExtResource("1_ku5ei")
 script = ExtResource("3_pf1eq")
-text = ""
+text = "TouchCheckBox"
 icon = null
 flat = false
 alignment = 0
@@ -203,7 +203,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme = ExtResource("1_ku5ei")
 script = ExtResource("4_il3hx")
-text = ""
+text = "TouchCheckButton"
 icon = null
 flat = false
 alignment = 0
@@ -236,6 +236,7 @@ size_flags_horizontal = 3
 
 [node name="PanelContainer2" type="PanelContainer" parent="PanelContainer/VBoxContainer/HBoxContainer4/VBoxContainer2"]
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_25w7k")
 
 [node name="TextureButton" type="TextureButton" parent="PanelContainer/VBoxContainer/HBoxContainer4/VBoxContainer2/PanelContainer2"]
@@ -263,6 +264,7 @@ size_flags_horizontal = 3
 
 [node name="PanelContainer2" type="PanelContainer" parent="PanelContainer/VBoxContainer/HBoxContainer4/VBoxContainer3"]
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_25w7k")
 
 [node name="TouchTextureButton" type="Control" parent="PanelContainer/VBoxContainer/HBoxContainer4/VBoxContainer3/PanelContainer2"]
