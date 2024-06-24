@@ -53,6 +53,10 @@ var flip_v := false:
 var texture_normal: Texture2D:
 	set = set_texture_normal, get = get_texture_normal
 
+## Texture to display when the mouse hovers the node.
+var texture_hover: Texture2D:
+	set = set_texture_hover, get = get_texture_hover
+
 ## Texture to display when the node is pressed.
 var texture_pressed: Texture2D:
 	set = set_texture_pressed, get = get_texture_pressed
@@ -60,6 +64,14 @@ var texture_pressed: Texture2D:
 ## Texture to display when the node is disabled. See [memeber BaseButton.disabled].
 var texture_disabled: Texture2D:
 	set = set_texture_disabled, get = get_texture_disabled
+
+## Texture to display when the node has mouse or keyboard focus.
+## [member texture_focused] is displayed [i]over[/i] the base texture, so a partially transparent texture should be used to ensure the base texture remains visible.
+## A texture that represents an outline or an underline works well for this purpose.
+## To disable the focus visual effect, assign a fully transparent texture of any size.
+## Note that disabling the focus visual effect will harm keyboard/controller navigation usability, so this is not recommended for accessibility reasons.
+var texture_focused: Texture2D:
+	set = set_texture_focused, get = get_texture_focused
 
 ## Pure black and white [BitMap] image to use for click detection.
 ## On the mask, white pixels represent the button's clickable area. Use it to create buttons with curved shapes.
@@ -76,7 +88,9 @@ func _get_property_list():
 		{ name = "Textures", type = TYPE_NIL, usage = PROPERTY_USAGE_GROUP },
 		{ name = "texture_normal", type = TYPE_OBJECT, hint = PROPERTY_HINT_RESOURCE_TYPE, hint_string = "Texture2D" },
 		{ name = "texture_pressed", type = TYPE_OBJECT, hint = PROPERTY_HINT_RESOURCE_TYPE, hint_string = "Texture2D" },
+		{ name = "texture_hover", type = TYPE_OBJECT, hint = PROPERTY_HINT_RESOURCE_TYPE, hint_string = "Texture2D" },
 		{ name = "texture_disabled", type = TYPE_OBJECT, hint = PROPERTY_HINT_RESOURCE_TYPE, hint_string = "Texture2D" },
+		{ name = "texture_focused", type = TYPE_OBJECT, hint = PROPERTY_HINT_RESOURCE_TYPE, hint_string = "Texture2D" },
 		{ name = "texture_click_mask", type = TYPE_OBJECT, hint = PROPERTY_HINT_RESOURCE_TYPE, hint_string = "BitMap" }
 	]
 
@@ -112,8 +126,18 @@ func set_texture_pressed(value):
 	_texture_changed()
 
 
+func set_texture_hover(value):
+	texture_hover = value
+	_texture_changed()
+
+
 func set_texture_disabled(value):
 	texture_disabled = value
+	_texture_changed()
+
+
+func set_texture_focused(value):
+	texture_focused = value
 	_texture_changed()
 
 
@@ -128,7 +152,9 @@ func is_fliped_h(): return flip_h
 func is_fliped_v(): return flip_v
 func get_texture_normal(): return texture_normal
 func get_texture_pressed(): return texture_pressed
+func get_texture_hover(): return texture_hover
 func get_texture_disabled(): return texture_disabled
+func get_texture_focused(): return texture_focused
 func get_texture_click_mask(): return texture_click_mask
 
 #endregion
@@ -138,6 +164,8 @@ func _notification(p_what: int) -> void:
 	match p_what:
 		NOTIFICATION_DRAW:
 			var draw_mode: int = get_draw_mode();
+			if draw_mode == DrawMode.DRAW_HOVER_PRESSED:
+				draw_mode = DrawMode.DRAW_PRESSED
 			
 			var texdraw: Texture2D
 			
@@ -147,10 +175,21 @@ func _notification(p_what: int) -> void:
 						texdraw = texture_normal
 				DrawMode.DRAW_PRESSED:
 					if texture_pressed == null:
-						if is_instance_valid(texture_normal):
-							texdraw = texture_normal
+						if texture_hover == null:
+							if is_instance_valid(texture_normal):
+								texdraw = texture_normal
+						else:
+							texdraw = texture_hover
 					else:
 						texdraw = texture_pressed
+				DrawMode.DRAW_HOVER:
+					if texture_hover == null:
+						if is_instance_valid(texture_pressed) and is_button_pressed():
+							texdraw = texture_pressed
+						elif is_instance_valid(texture_normal):
+							texdraw = texture_normal
+					else:
+						texdraw = texture_hover
 				DrawMode.DRAW_DISABLED:
 					if texture_disabled == null:
 						if is_instance_valid(texture_normal):
@@ -277,4 +316,4 @@ func _has_point(p_point: Vector2):
 		
 		return texture_click_mask.get_bitv(point)
 	
-	return _in_rect(p_point)
+	return get_global_rect().has_point(p_point)

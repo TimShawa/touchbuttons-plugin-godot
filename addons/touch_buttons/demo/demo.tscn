@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://owe3qweiqgww"]
+[gd_scene load_steps=14 format=3 uid="uid://owe3qweiqgww"]
 
 [ext_resource type="Theme" uid="uid://qcx845elaf8m" path="res://addons/touch_buttons/buttons.theme" id="1_ku5ei"]
 [ext_resource type="Script" path="res://addons/touch_buttons/touch_button.gd" id="2_skgwy"]
@@ -8,6 +8,16 @@
 [ext_resource type="Texture2D" uid="uid://cjyw1qgjyc3sh" path="res://addons/touch_buttons/demo/preview_texture.png" id="6_pgbs4"]
 [ext_resource type="Texture2D" uid="uid://c780xkwcq3joe" path="res://addons/touch_buttons/demo/preview_texture_pressed.png" id="7_hm2a5"]
 [ext_resource type="Script" path="res://addons/touch_buttons/touch_texture_button.gd" id="8_incbk"]
+
+[sub_resource type="GDScript" id="GDScript_1jbv2"]
+script/source = "extends Control
+
+
+func _ready() -> void:
+	return
+	Input.emulate_mouse_from_touch = false
+	Input.emulate_touch_from_mouse = false
+"
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m3qrx"]
 content_margin_left = 10.0
@@ -56,6 +66,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = SubResource("GDScript_1jbv2")
 metadata/_edit_lock_ = true
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
@@ -88,13 +99,6 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("5_kvkek")
-disabled = false
-toggle_mode = false
-button_pressed = false
-action_mode = 1
-passby_press = false
-pass_screen_drag = false
-button_group = null
 
 [node name="Label" type="Label" parent="PanelContainer/VBoxContainer/BoxContainer/TouchButtonBase"]
 layout_mode = 1
@@ -125,25 +129,6 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("2_skgwy")
-text = "TouchButton"
-icon = null
-flat = false
-alignment = 1
-text_overrun_behavior = 0
-autowrap_mode = 0
-clip_text = false
-icon_alignment = 0
-vertical_icon_alignment = 1
-expand_icon = false
-text_direction = 0
-language = ""
-disabled = false
-toggle_mode = false
-button_pressed = false
-action_mode = 1
-passby_press = false
-pass_screen_drag = false
-button_group = null
 
 [node name="HSeparator2" type="HSeparator" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
@@ -171,11 +156,11 @@ alignment = 0
 text_overrun_behavior = 0
 autowrap_mode = 0
 clip_text = false
-icon_alignment = 0
-vertical_icon_alignment = 1
+icon_alignment = 1
+vertical_icon_alignment = 0
 expand_icon = false
 text_direction = 0
-language = ""
+language = "TouchCheckBox"
 disabled = false
 toggle_mode = true
 button_pressed = false
@@ -183,6 +168,7 @@ action_mode = 1
 passby_press = false
 pass_screen_drag = false
 button_group = null
+touch_input_only = false
 
 [node name="HSeparator3" type="HSeparator" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
@@ -210,11 +196,11 @@ alignment = 0
 text_overrun_behavior = 0
 autowrap_mode = 0
 clip_text = false
-icon_alignment = 0
-vertical_icon_alignment = 1
+icon_alignment = 1
+vertical_icon_alignment = 0
 expand_icon = false
 text_direction = 0
-language = ""
+language = "TouchCheckButton"
 disabled = false
 toggle_mode = true
 button_pressed = false
@@ -222,6 +208,7 @@ action_mode = 1
 passby_press = false
 pass_screen_drag = false
 button_group = null
+touch_input_only = false
 
 [node name="HSeparator4" type="HSeparator" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
@@ -277,7 +264,9 @@ flip_h = false
 flip_v = false
 texture_normal = ExtResource("6_pgbs4")
 texture_pressed = ExtResource("7_hm2a5")
+texture_hover = null
 texture_disabled = null
+texture_focused = null
 texture_click_mask = null
 disabled = false
 toggle_mode = false
@@ -286,6 +275,7 @@ action_mode = 1
 passby_press = false
 pass_screen_drag = false
 button_group = null
+touch_input_only = false
 
 [node name="Label2" type="Label" parent="PanelContainer/VBoxContainer/HBoxContainer4/VBoxContainer3"]
 layout_mode = 2

@@ -19,8 +19,7 @@ class_name TouchButton extends TouchBaseButton
 ## [/codeblock]
 ## See also [TouchBaseButton] which contains common properties and methods associated with this node.[br]
 ## [br]
-## [TouchButton]s ACTUALLY interpret touch input and support multitouch, unlike built-in [Button]s, and ignore mouse/shortcuts.
-## Therefore there are not FOCUSED, HOVERED and HOVERED_PRESSED states.[br]
+## [TouchButton]s ACTUALLY interpret touch input and support multitouch, unlike built-in [Button]s.
 ## [br]
 ## To change button appearance attach [Theme] resourse to the node and modify its parameters. Also custom [member theme_type_variation] will be used, if specified.
 ## Theme properties and default values can be found at [code]res://addons/touch_buttons/buttons.theme[/code].[br]
@@ -167,6 +166,9 @@ func _ready() -> void:
 		
 		_n_control().add_child(Label.new(), true)
 		_n_text().vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		
+		_n_panel().add_child(Node.new(), true)
+		_n_panel().get_node(^"Node").add_child(Panel.new(), true)
 
 
 func _draw() -> void:
@@ -177,11 +179,11 @@ func _draw() -> void:
 	
 	_n_panel().self_modulate = Color.TRANSPARENT if flat else Color.WHITE
 	
-	_n_hbox().add_theme_constant_override("separation", _get_button_constant("h_separation", _theme_type))
+	_n_hbox().add_theme_constant_override("separation", get_theme_item("constant", "h_separation", _theme_type))
 	
-	_n_text().add_theme_font_override("font", _get_button_font("font", _theme_type))
-	_n_text().add_theme_color_override("font_outline_color", _get_button_color("font_outline_color", _theme_type))
-	_n_text().add_theme_font_size_override("font_size", _get_button_font_size("font_size", _theme_type))
+	_n_text().add_theme_font_override("font", get_theme_item("font", "font", _theme_type))
+	_n_text().add_theme_color_override("font_outline_color", get_theme_item("color", "font_outline_color", _theme_type))
+	_n_text().add_theme_font_size_override("font_size", get_theme_item("font_size", "font_size", _theme_type))
 	_n_text().text = self.text
 	_n_text().horizontal_alignment = self.alignment
 	_n_text().text_overrun_behavior = self.text_overrun_behavior
@@ -193,9 +195,9 @@ func _draw() -> void:
 	if is_instance_valid(icon):
 		_n_icon().show()
 		_n_icon().texture = self.icon
-	elif _has_theme_icon("icon", _theme_type):
+	elif has_theme_item("icon", "icon", _theme_type):
 		_n_icon().show()
-		_n_icon().texture = _get_button_icon("icon", _theme_type)
+		_n_icon().texture = get_theme_item("icon", "icon", _theme_type)
 	else:
 		_n_icon().hide()
 	
@@ -214,20 +216,45 @@ func _draw() -> void:
 		_n_icon().expand_mode = TextureRect.EXPAND_KEEP_SIZE
 		_n_icon().stretch_mode = TextureRect.STRETCH_KEEP
 	
+	if has_focus():
+		var style: StyleBox = get_theme_item("stylebox", "focus", _theme_type)
+		if is_instance_valid(style):
+			style.draw(get_canvas_item(), Rect2(Vector2.ZERO, size))
+	
 	match get_draw_mode():
 		DrawMode.DRAW_NORMAL:
-			_n_panel().add_theme_stylebox_override("panel", _get_button_stylebox("normal", _theme_type))
-			_n_icon().self_modulate = _get_button_color("icon_normal_color", _theme_type)
-			_n_text().add_theme_color_override("font_color", _get_button_color("font_color", _theme_type))
+			_n_panel().add_theme_stylebox_override("panel", get_theme_item("stylebox", "normal", _theme_type))
+			if has_theme_item("color", "icon_normal_color", _theme_type):
+				_n_icon().self_modulate = get_theme_item("color", "icon_normal_color", _theme_type)
+			_n_text().add_theme_color_override("font_color", get_theme_item("color", "font_color", _theme_type))
+		
 		DrawMode.DRAW_PRESSED:
-			_n_panel().add_theme_stylebox_override("panel", _get_button_stylebox("pressed", _theme_type))
-			_n_icon().self_modulate = _get_button_color("icon_pressed_color")
-			_n_text().add_theme_color_override("font_color", _get_button_color("font_pressed_color", _theme_type))
+			_n_panel().add_theme_stylebox_override("panel", get_theme_item("stylebox", "pressed", _theme_type))
+			if has_theme_item("color", "icon_pressed_color", _theme_type):
+				_n_icon().self_modulate = get_theme_item("color", "icon_pressed_color")
+			_n_text().add_theme_color_override("font_color", get_theme_item("color", "font_pressed_color", _theme_type))
+		
+		DrawMode.DRAW_HOVER:
+			_n_panel().add_theme_stylebox_override("panel", get_theme_item("stylebox", "hover", _theme_type))
+			if has_theme_item("color", "icon_pressed_color", _theme_type):
+				_n_icon().self_modulate = get_theme_item("color", "icon_hover_color", _theme_type)
+			_n_text().add_theme_color_override("font_color", get_theme_item("color", "font_hover_color", _theme_type))
+		
 		DrawMode.DRAW_DISABLED:
-			_n_panel().add_theme_stylebox_override("panel", _get_button_stylebox("disabled", _theme_type))
-			_n_icon().self_modulate = _get_button_color("icon_disabled_color")
-			_n_text().add_theme_color_override("font_color", _get_button_color("font_disabled_color", _theme_type))
-	#print_tree_pretty()
+			_n_panel().add_theme_stylebox_override("panel", get_theme_item("stylebox", "disabled", _theme_type))
+			if has_theme_item("color", "icon_disabled_color", _theme_type):
+				_n_icon().self_modulate = get_theme_item("color", "icon_disabled_color")
+			_n_text().add_theme_color_override("font_color", get_theme_item("color", "font_disabled_color", _theme_type))
+		
+		DrawMode.DRAW_HOVER_PRESSED:
+			if has_theme_item("stylebox", "hover_pressed", _theme_type):
+				_n_panel().add_theme_stylebox_override("panel", get_theme_item("stylebox", "hover_pressed", _theme_type))
+			else:
+				_n_panel().add_theme_stylebox_override("panel", get_theme_item("stylebox", "pressed", _theme_type))
+			if has_theme_item("color", "icon_hover_pressed_color", _theme_type):
+				_n_icon().self_modulate = get_theme_item("color", "icon_hover_pressed_color", _theme_type)
+			_n_text().add_theme_color_override("font_color", get_theme_item("color", "font_hover_pressed_color", _theme_type))
+
 
 func _notification(what: int) -> void:
 	match what:
@@ -236,43 +263,24 @@ func _notification(what: int) -> void:
 
 
 func _n_panel() -> PanelContainer:
-	if has_node("__button_panel"):
-		return $__button_panel
-#	push_error("There is no __button_panel node.")
-	return null
-
-
+	return get_node_or_null(^"__button_panel")
 func _n_hbox() -> HBoxContainer:
-	if has_node("__button_panel/HBoxContainer"):
-		return $__button_panel/HBoxContainer
-	return null
-
-
+	return get_node_or_null(^"__button_panel/HBoxContainer")
 func _n_control() -> Control:
-	if has_node("__button_panel/HBoxContainer/Control"):
-		return $__button_panel/HBoxContainer/Control
-	return null
-
-
+	return get_node_or_null(^"__button_panel/HBoxContainer/Control")
 func _n_icon() -> TextureRect:
-	if has_node("__button_panel/HBoxContainer/Control/TextureRect"):
-		return $__button_panel/HBoxContainer/Control/TextureRect
-#	push_error("There is no __button_panel/HBoxContainer/TextureRect node.")
-	return null
-
-
+	return get_node_or_null(^"__button_panel/HBoxContainer/Control/TextureRect")
 func _n_text() -> Label:
-	if has_node("__button_panel/HBoxContainer/Control/Label"):
-		return $__button_panel/HBoxContainer/Control/Label
-#	push_error("There is no __button_panel/HBoxContainer/Label node.")
-	return null
+	return get_node_or_null(^"__button_panel/HBoxContainer/Control/Label")
+func _n_focus() -> Panel: # ForFocus
+	return get_node_or_null(^"__button_panel/Node/Panel")
 
 
 func _update_controls_size():
 	_n_panel().size = size
 	update_minimum_size()
 	
-	var sep: int = _get_button_constant("h_separation", _theme_type)
+	var sep: int = get_theme_item("constant", "h_separation", _theme_type)
 	var con_size: Vector2 = _n_control().size
 	
 	if !_n_icon().visible or _n_icon().texture == null:
@@ -354,7 +362,7 @@ func _get_minimum_size() -> Vector2:
 	if !is_node_ready():
 		await ready
 	
-	var separation = _get_button_constant("h_separation", _theme_type)
+	var separation = get_theme_item("constant", "h_separation", _theme_type)
 	var stylebox: StyleBox = _n_panel().get_theme_stylebox("panel","PanelContainer")
 	var borders := Vector2(
 		stylebox.content_margin_left + stylebox.content_margin_right,
@@ -390,65 +398,32 @@ func _get_minimum_size() -> Vector2:
 	return min_size
 
 
-func _get_button_color(name: StringName, theme_type: StringName = _theme_type) -> Color:
+func get_theme_item(item: StringName, name: StringName, theme_type: StringName = "") -> Variant:
 	if !theme_type_variation.is_empty():
 		theme_type = theme_type_variation
-	if is_instance_valid(theme):
-		if theme.has_color(name, theme_type):
-			return theme.get_color(name, theme_type)
-	return _buttons_theme.get_color(name, theme_type)
+	if theme and theme.call("has_%s" % item, name, theme_type):
+		return theme.call("get_%s" % item, name, theme_type)
+	elif _buttons_theme.call("has_%s" % item, name, theme_type):
+		return _buttons_theme.call("get_%s" % item, name, theme_type)
+	match item:
+		"color": return Color.TRANSPARENT
+		"constant": return 0
+		"font": return ThemeDB.get_default_theme().default_font
+		"font_size": return ThemeDB.get_default_theme().default_font_size
+		"icon": return Texture2D.new()
+		"stylebox": return StyleBoxEmpty.new()
+	return null
 
 
-func _get_button_constant(name: StringName, theme_type: StringName = _theme_type) -> int:
+func has_theme_item(item: StringName, name: StringName, theme_type: StringName = "") -> Variant:
 	if !theme_type_variation.is_empty():
 		theme_type = theme_type_variation
-	if is_instance_valid(theme):
-		if theme.has_constant(name, theme_type):
-			return theme.get_constant(name, theme_type)
-	return _buttons_theme.get_constant(name, theme_type)
+	if theme and theme.call("has_%s" % item, name, theme_type):
+		return true
+	elif _buttons_theme.call("has_%s" % item, name, theme_type):
+		return true
+	return false
 
 
-func _get_button_font(name: StringName, theme_type: StringName = _theme_type) -> Font:
-	if !theme_type_variation.is_empty():
-		theme_type = theme_type_variation
-	if is_instance_valid(theme):
-		if theme.has_font(name, theme_type):
-			return theme.get_font(name, theme_type)
-	return _buttons_theme.get_font(name, theme_type)
-
-
-func _get_button_font_size(name: StringName, theme_type: StringName = _theme_type) -> int:
-	if !theme_type_variation.is_empty():
-		theme_type = theme_type_variation
-	if is_instance_valid(theme):
-		if theme.has_font_size(name, theme_type):
-			return theme.get_font_size(name, theme_type)
-	return _buttons_theme.get_font_size(name, theme_type)
-
-
-func _get_button_icon(name: StringName, theme_type: StringName = _theme_type) -> Texture2D:
-	if !theme_type_variation.is_empty():
-		theme_type = theme_type_variation
-	if is_instance_valid(theme):
-		if theme.has_icon(name, theme_type):
-			return theme.get_icon(name, theme_type)
-	return _buttons_theme.get_icon(name, theme_type)
-
-
-func _get_button_stylebox(name: StringName, theme_type: StringName = _theme_type) -> StyleBox:
-	if !theme_type_variation.is_empty():
-		theme_type = theme_type_variation
-	if is_instance_valid(theme):
-		if theme.has_stylebox(name, theme_type):
-			return theme.get_stylebox(name, theme_type)
-	return _buttons_theme.get_stylebox(name, theme_type)
-
-
-func _has_theme_icon(name, theme_type):
-	if !theme_type_variation.is_empty():
-		theme_type = theme_type_variation
-	if is_instance_valid(theme):
-		if theme.has_icon(name, theme_type):
-			return true
-	return _buttons_theme.has_icon(name, theme_type)
-	
+func _init(text := ""):
+	set_text(text)

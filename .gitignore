@@ -6,6 +6,8 @@ addons/godunity_theme
 addons/post_processing
 project.godot
 project_theme.tres
+kanban*
+control.tscn
 
 # Godot 4+ specific ignores
 .godot/
