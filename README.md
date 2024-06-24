@@ -1,14 +1,25 @@
 # touchbuttons-plugin-godot
-This plugin for Godot Engine 4.1+ adds TouchBaseButton class and its subclasses. TouchButtons are roughly similar to its native BaseButton-deriver buttons but have some differences, such as:
-- Most valuable: TouchButtons support multitouch.
-- TouchButtons have not `hovered`, `focused` and other associated states by the reason of its usage (touchscreens).
+This plugin for Godot Engine 4.1+ adds TouchBaseButton class and its subclasses. TouchButtons are roughly similar to its native BaseButton-derived buttons but have some differences, such as:
+
+- Most valuable difference: TouchButtons support multitouch.
 - There's no support of shortcuts, but it might be added in the future.
 - Appearance manipulation (theme) differ with native buttons' one according to Engine limitations. See [Change Appearance](#change-appearance) for more information.
+- Button *"click"*, *"toggle"* and *"pass-by"* press modes switch between each other with `press_mode`.
+- Mouse responding can be disabled with `mouse_enabled` set to `false`.
 
+\
 Most of buttons functionality can be found in the native Buttons docs. There is some additional options:
-- (when `toggle_mode` is `true`) Pass-by Press: Button become pressed when finger enters its pressable area and become released when finger exits.
-- Pass Screen Drag: Button forwards any recieved screen drag input event with `drag_input` signal.
+- Pass-by Press: Button become pressed when finger enters its pressable area and become released when finger exits.
+- Pass Screen Drag (in "click" press mode): Button forwards any recieved screen drag input event with `drag_input` signal.
 - TouchButtons use **TouchButtonGroup**s instead of native ButtonGroup resource, because ButtonGroups support only built-in Buttons.
+
+## Added items:
+- **TouchBaseButton**: base for all touchscreen buttons
+- **TouchGroupButton**: resource for setup touchscreen buttons as radio
+- **TouchButton**: Default touchscreen button
+- **TouchCheckbox**: Button that represents a binary choice, used for option that should be confirmed; change appearance when is radio
+- **TouchCheckButton**: Button that represents a binary choice, used for option that has immediate effect
+- **TouchTextureButton**: Button that use texture properties instead of theme property for state appearance
 
 ## Change appearance
 Any TouchButton automatically loads default buttons' theme, located at `res://addons/touch_buttons/buttons.theme`.
