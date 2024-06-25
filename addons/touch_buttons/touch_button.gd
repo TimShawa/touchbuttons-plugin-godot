@@ -1,5 +1,5 @@
 @tool
-@icon("res://addons/touch_buttons/icons/icon_touch_button.png")
+@icon("res://addons/touch_buttons/icons/icon_touch_button.svg")
 class_name TouchButton extends TouchBaseButton
 
 

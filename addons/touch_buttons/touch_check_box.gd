@@ -1,6 +1,6 @@
 @tool
-@icon("res://addons/touch_buttons/icons/icon_touch_check_box.png")
-class_name TouchCheckBox extends TouchButton
+@icon("res://addons/touch_buttons/icons/icon_touch_check_box.svg")
+class_name ToucCheckBox extends TouchButton
 
 
 ## A touchscreen button that represents a binary choice.

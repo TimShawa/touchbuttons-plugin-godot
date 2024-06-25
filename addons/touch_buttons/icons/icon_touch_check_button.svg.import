@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://2hxolm10hvbf"
-path="res://.godot/imported/icon_touch_check_box.png-33984e79d74c0f57b7ad162e963c5450.ctex"
+uid="uid://d071fftnq6qv1"
+path="res://.godot/imported/icon_touch_check_button.svg-d4fb04466a2613cb61455d3ecd24c974.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/touch_buttons/icons/icon_touch_check_box.png"
-dest_files=["res://.godot/imported/icon_touch_check_box.png-33984e79d74c0f57b7ad162e963c5450.ctex"]
+source_file="res://addons/touch_buttons/icons/icon_touch_check_button.svg"
+dest_files=["res://.godot/imported/icon_touch_check_button.svg-d4fb04466a2613cb61455d3ecd24c974.ctex"]
 
 [params]
 
@@ -32,3 +32,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=2.0
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false
