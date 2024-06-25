@@ -98,7 +98,16 @@ layout_mode = 2
 [node name="TouchButtonBase" type="Control" parent="PanelContainer/VBoxContainer/BoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+focus_mode = 2
 script = ExtResource("5_kvkek")
+disabled = false
+button_pressed = false
+press_mode = 0
+action_mode = 1
+pass_screen_drag = false
+mouse_enabled = true
+mouse_button_mask = 1
+button_group = null
 
 [node name="Label" type="Label" parent="PanelContainer/VBoxContainer/BoxContainer/TouchButtonBase"]
 layout_mode = 1
@@ -129,6 +138,26 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("2_skgwy")
+text = ""
+icon = null
+flat = false
+alignment = 1
+text_overrun_behavior = 0
+autowrap_mode = 0
+clip_text = false
+icon_alignment = 0
+vertical_icon_alignment = 1
+expand_icon = false
+text_direction = 0
+language = ""
+disabled = false
+button_pressed = false
+press_mode = 0
+action_mode = 1
+pass_screen_drag = false
+mouse_enabled = true
+mouse_button_mask = 1
+button_group = null
 
 [node name="HSeparator2" type="HSeparator" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
@@ -162,13 +191,13 @@ expand_icon = false
 text_direction = 0
 language = "TouchCheckBox"
 disabled = false
-toggle_mode = true
 button_pressed = false
+press_mode = 1
 action_mode = 1
-passby_press = false
 pass_screen_drag = false
+mouse_enabled = true
+mouse_button_mask = 1
 button_group = null
-touch_input_only = false
 
 [node name="HSeparator3" type="HSeparator" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
@@ -202,13 +231,13 @@ expand_icon = false
 text_direction = 0
 language = "TouchCheckButton"
 disabled = false
-toggle_mode = true
 button_pressed = false
+press_mode = 1
 action_mode = 1
-passby_press = false
 pass_screen_drag = false
+mouse_enabled = true
+mouse_button_mask = 1
 button_group = null
-touch_input_only = false
 
 [node name="HSeparator4" type="HSeparator" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
@@ -257,6 +286,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_25w7k")
 [node name="TouchTextureButton" type="Control" parent="PanelContainer/VBoxContainer/HBoxContainer4/VBoxContainer3/PanelContainer2"]
 texture_filter = 1
 layout_mode = 2
+focus_mode = 2
 script = ExtResource("8_incbk")
 ignore_texture_size = false
 stretch_mode = 6
@@ -269,13 +299,13 @@ texture_disabled = null
 texture_focused = null
 texture_click_mask = null
 disabled = false
-toggle_mode = false
 button_pressed = false
+press_mode = 0
 action_mode = 1
-passby_press = false
 pass_screen_drag = false
+mouse_enabled = true
+mouse_button_mask = 1
 button_group = null
-touch_input_only = false
 
 [node name="Label2" type="Label" parent="PanelContainer/VBoxContainer/HBoxContainer4/VBoxContainer3"]
 layout_mode = 2

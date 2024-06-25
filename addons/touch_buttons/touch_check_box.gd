@@ -1,4 +1,5 @@
 @tool
+@icon("res://addons/touch_buttons/icons/icon_touch_check_box.png")
 class_name TouchCheckBox extends TouchButton
 
 

@@ -1,6 +1,6 @@
 @tool
+@icon("res://addons/touch_buttons/icons/icon_touch_base_button.png")
 class_name TouchBaseButton extends Control
-
 
 ## A base class for touchscreen GUI buttons.
 ## 

@@ -1,4 +1,5 @@
 @tool
+@icon("res://addons/touch_buttons/icons/icon_touch_button_group.png")
 class_name TouchButtonGroup extends Resource
 
 
