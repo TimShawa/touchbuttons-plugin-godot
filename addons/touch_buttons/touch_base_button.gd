@@ -348,16 +348,20 @@ func _input(event: InputEvent) -> void:
 								self.button_pressed = false
 				
 				if event is InputEventMouseButton:
-					if mouse_button_mask & _get_button_mask(event.button_index):
-						if event.is_pressed() and !is_button_pressed(): # PRESS
-							self.button_pressed = true
-							_was_pressed_by_mouse = true
-						if event.is_released() and is_button_pressed(): # RELEASE
-							if _was_pressed_by_mouse:
-								self.button_pressed = false
+					if _has_point(event.position):
+						if mouse_button_mask & _get_button_mask(event.button_index):
+							if event.is_pressed() and !is_button_pressed(): # PRESS
+								self.button_pressed = true
+								_was_pressed_by_mouse = true
+							if event.is_released() and is_button_pressed(): # RELEASE
+								if _was_pressed_by_mouse:
+									self.button_pressed = false
 				
 				if event is InputEventMouseMotion:
-					if mouse_button_mask & _get_button_mask(event.button_index):
+					var mask: bool = Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and mouse_button_mask & MOUSE_BUTTON_LEFT
+					mask = mask or (Input.is_mouse_button_pressed(MOUSE_BUTTON_MIDDLE) and mouse_button_mask & MOUSE_BUTTON_MIDDLE)
+					mask = mask or (Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT) and mouse_button_mask & MOUSE_BUTTON_RIGHT)
+					if mask:
 						if _has_point(event.position) and !is_button_pressed(): # ENTER
 							self.button_pressed = true
 							_was_pressed_by_mouse = true
