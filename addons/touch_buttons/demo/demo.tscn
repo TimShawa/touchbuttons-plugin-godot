@@ -1,6 +1,6 @@
 [gd_scene load_steps=14 format=3 uid="uid://owe3qweiqgww"]
 
-[ext_resource type="Theme" uid="uid://qcx845elaf8m" path="res://addons/touch_buttons/buttons.theme" id="1_ku5ei"]
+[ext_resource type="Theme" uid="uid://drsdi3tb3krys" path="res://addons/touch_buttons/buttons_theme.tres" id="1_ku5ei"]
 [ext_resource type="Script" path="res://addons/touch_buttons/touch_button.gd" id="2_skgwy"]
 [ext_resource type="Script" path="res://addons/touch_buttons/touch_check_box.gd" id="3_pf1eq"]
 [ext_resource type="Script" path="res://addons/touch_buttons/touch_check_button.gd" id="4_il3hx"]
@@ -15,8 +15,6 @@ script/source = "extends Control
 
 func _ready() -> void:
 	return
-	Input.emulate_mouse_from_touch = false
-	Input.emulate_touch_from_mouse = false
 "
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m3qrx"]

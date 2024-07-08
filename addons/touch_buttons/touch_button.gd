@@ -23,7 +23,7 @@ class_name TouchButton extends TouchBaseButton
 ## [TouchButton]s ACTUALLY interpret touch input and support multitouch, unlike built-in [Button]s.
 ## [br]
 ## To change button appearance attach [Theme] resourse to the node and modify its parameters. Also custom [member theme_type_variation] will be used, if specified.
-## Theme properties and default values can be found at [code]res://addons/touch_buttons/buttons.theme[/code].[br]
+## Theme properties and default values can be found at [code]res://addons/touch_buttons/buttons_theme.tres[/code].[br]
 ## [br]
 ## [i]Touchscreen equivalent of buiilt-in [Button].[/i]
 
@@ -108,7 +108,7 @@ func _get_property_list():
 
 
 var _theme_type := "TouchButton"
-var _buttons_theme = load("res://addons/touch_buttons/buttons.theme")
+var _buttons_theme = load("res://addons/touch_buttons/buttons_theme.tres")
 
 
 #region SETGET
