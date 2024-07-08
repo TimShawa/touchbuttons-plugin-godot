@@ -124,8 +124,8 @@ func set_icon_alignment(value): icon_alignment = value; queue_redraw()
 func set_vertical_icon_alignment(value): vertical_icon_alignment = value; queue_redraw()
 
 func set_expand_icon(value):
-	expand_icon = value;
-	size = get_combined_minimum_size().max(size)
+	expand_icon = value
+	size = _vec2_max(get_combined_minimum_size(), size)
 	queue_redraw()
 
 func set_text_direction(value): text_direction = value; queue_redraw()
@@ -394,7 +394,7 @@ func _get_minimum_size() -> Vector2:
 			text_size.x + icon_size.x,
 			max(text_size.y, icon_size.y))
 	else:
-		min_size += text_size.max(icon_size)
+		min_size += _vec2_max(text_size, icon_size)
 	
 	return min_size
 
@@ -428,3 +428,10 @@ func has_theme_item(item: StringName, name: StringName, theme_type: StringName =
 
 func _init(text := ""):
 	set_text(text)
+
+
+func _vec2_max(a: Vector2, b: Vector2):
+	return Vector2(
+		maxf(a.x, b.x),
+		maxf(a.y, b.y)
+	)

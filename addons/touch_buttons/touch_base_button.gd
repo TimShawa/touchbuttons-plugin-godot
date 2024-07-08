@@ -357,7 +357,6 @@ func _input(event: InputEvent) -> void:
 								self.button_pressed = false
 				
 				if event is InputEventMouseMotion:
-					print(event.button_mask)
 					if mouse_button_mask & _get_button_mask(event.button_index):
 						if _has_point(event.position) and !is_button_pressed(): # ENTER
 							self.button_pressed = true
@@ -451,7 +450,6 @@ func _unpress_group():
 
 
 func _get_button_mask(index: int) -> int:
-	print(String.num_int64(mouse_button_mask & (2 ** (index - 1)), 2))
 	if index <= MOUSE_BUTTON_NONE:
 		return 0
 	return 2 ** (index - 1)
