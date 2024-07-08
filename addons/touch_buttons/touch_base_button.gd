@@ -23,7 +23,7 @@ signal button_up
 signal pressed
 ## Emitted when the button was just toggled between pressed and normal states (will not work in "click" mode). The new state is contained in the [param toggled_on] argument.
 signal toggled(toggled_on: bool)
-## Emitted when the button forwards recieved [class InputEventScreenDrag].
+## Emitted when the button forwards recieved [InputEventScreenDrag].
 signal drag_input(event)
 
 
@@ -247,7 +247,7 @@ func _input(event: InputEvent) -> void:
 	if is_disabled():
 		return
 	
-	if event.device == InputEvent.DEVICE_ID_EMULATION:
+	if event.device == -1:
 		return
 	
 	if !Engine.is_editor_hint():
