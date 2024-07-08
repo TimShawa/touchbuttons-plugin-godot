@@ -1,6 +1,6 @@
 @tool
 @icon("res://addons/touch_buttons/icons/icon_touch_texture_button.svg")
-class_name ToucTextureButton extends TouchBaseButton
+class_name TouchTextureButton extends TouchBaseButton
 
 
 ## Texture-based touchscreen button. Supports Pressed, and Disabled states.
