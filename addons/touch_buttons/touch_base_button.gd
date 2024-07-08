@@ -19,9 +19,9 @@ signal button_down
 signal button_up
 ## Emitted when the button is toggled or pressed. This is on [signal button_down] if [member action_mode] is [enum ActionMode.ACTION_MODE_BUTTON_PRESS] and on [signal button_up] otherwise.[br]
 ## [br]
-## If you need to know the button's pressed state (and [member toggle_mode] is active), use [signal toggled] instead.
+## If you need to know the button's pressed state (and button isn't in "click" mode), use [signal toggled] instead.
 signal pressed
-## Emitted when the button was just toggled between pressed and normal states (only if [member toggle_mode] is active). The new state is contained in the [param toggled_on] argument.
+## Emitted when the button was just toggled between pressed and normal states (will not work in "click" mode). The new state is contained in the [param toggled_on] argument.
 signal toggled(toggled_on: bool)
 ## Emitted when the button forwards recieved [class InputEventScreenDrag].
 signal drag_input(event)
@@ -165,10 +165,11 @@ func set_action_mode(value): action_mode = value
 func _emit_pressed():
 	emit_signal("button_down")
 	
-	if is_toggle_mode():
+	if press_mode != PressMode.MODE_CLICK:
 		emit_signal("toggled", true)
-		if is_instance_valid(button_group):
-			button_group.emit_signal("pressed", self)
+		if is_toggle_mode():
+			if is_instance_valid(button_group):
+				button_group.emit_signal("pressed", self)
 	
 	if action_mode == ActionMode.ACTION_MODE_BUTTON_PRESS:
 		emit_signal("pressed")
@@ -177,7 +178,7 @@ func _emit_pressed():
 func _emit_released():
 	emit_signal("button_up")
 	
-	if is_toggle_mode():
+	if press_mode != PressMode.MODE_CLICK:
 		emit_signal("toggled", false)
 	
 	if action_mode == ActionMode.ACTION_MODE_BUTTON_PRESS:
@@ -405,11 +406,11 @@ func set_pressed_no_signal(p_pressed: bool) -> void:
 	_was_pressed_by_mouse = false
 
 
-## Called when the button is pressed. If you need to know the button's pressed state (and [member toggle_mode] is active), use [method _toggled] instead.
+## Called when the button is pressed. If you need to know the button's pressed state (and the button isn't in "click" mode), use [method _toggled] instead.
 func _pressed() -> void: pass
 
 
-## Called when the button is toggled (only if [member toggle_mode] is active).
+## Called when the button is toggled (will not be emitted automatically in "click" mode).
 func _toggled(toggled_on: bool) -> void: pass
 
 
