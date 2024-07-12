@@ -1,3 +1,4 @@
+*.tmp
 icon.svg
 icon.svg.import
 default_env.tres
@@ -7,7 +8,7 @@ addons/post_processing
 project.godot
 project_theme.tres
 kanban*
-control.tscn
+#control.tscn
 
 # Godot 4+ specific ignores
 .godot/

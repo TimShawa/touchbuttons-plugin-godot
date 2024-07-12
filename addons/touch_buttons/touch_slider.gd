@@ -3,7 +3,7 @@ class_name TouchSlider extends Range
 
 
 signal drag_started()
-signal drag_ended()
+signal drag_ended(value_changed: bool)
 
 
 var editable: bool = true:
@@ -13,7 +13,7 @@ var scrollable: bool = true:
 var tick_count: int = 0:
 	set = set_tick_count, get = get_tick_count
 var ticks_on_borders: bool = false:
-	set = set_ticks_on_borders, get = get_tick_on_borders
+	set = set_ticks_on_borders, get = get_ticks_on_borders
 
 
 func _get_property_list():
@@ -24,14 +24,15 @@ func _get_property_list():
 			name = "tick_count", type = TYPE_INT,
 			hint = PROPERTY_HINT_RANGE,
 			hint_string = "%s,%s,%s,or_greater" % [0, floori((max_value - min_value) / step), 1]
-		}
+		},
+		{ name = "ticks_on_borders", type = TYPE_BOOL }
 	]
 
 
 var _orientation: Orientation = HORIZONTAL
 var _grab: Grab = Grab.new()
 var _theme_cache: ThemeCache = ThemeCache.new()
-var _theme_type = "TouchHSlider":
+var _theme_type = "TouchSlider":
 	set(value):
 		_theme_type = value
 		_theme_cache._theme_type = _theme_type
@@ -69,8 +70,8 @@ func set_ticks_on_borders(value):
 		ticks_on_borders = value
 		queue_redraw()
 
-func get_tick_on_borders():
-	return get_tick_on_borders()
+func get_ticks_on_borders():
+	return ticks_on_borders
 
 #endregion
 
@@ -78,7 +79,6 @@ func get_tick_on_borders():
 func _init():
 	self.focus_mode = Control.FOCUS_ALL
 	self.step = 1.0
-	
 
 
 func _get_minimum_size():
@@ -92,6 +92,9 @@ func _get_minimum_size():
 
 
 func _gui_input(event):
+	if Engine.is_editor_hint():
+		return
+	
 	if !editable:
 		return
 	
@@ -127,13 +130,14 @@ func _gui_input(event):
 				_grab.active = false
 				var value_changed = !is_equal_approx(float(_grab.value_before_dragging), get_as_ratio())
 				drag_ended.emit(value_changed)
-		
-		elif scrollable:
+	
+	if event is InputEventMouseButton:
+		if scrollable:
 			if event.is_pressed() and event.button_index == MOUSE_BUTTON_WHEEL_UP:
 				if focus_mode != FOCUS_NONE:
 					grab_focus()
 				set_value(get_value() + get_step())
-			elif event.pressed() and event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			elif event.is_pressed() and event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 				if focus_mode != FOCUS_NONE:
 					grab_focus()
 				set_value(get_value() - get_step())
@@ -171,7 +175,9 @@ func _notification(what):
 			_grab.active = false
 		
 		NOTIFICATION_DRAW:
-			#print(_theme_cache.tick_icon)
+			if _theme_type == "TouchSlider":
+				return
+			
 			var ci: RID = get_canvas_item()
 			var ratio: float = 0 if is_nan(get_as_ratio()) else get_as_ratio()
 			
@@ -251,42 +257,59 @@ class Grab extends Resource:
 
 
 class ThemeCache extends Resource:
-	var _theme: Theme = preload("res://addons/touch_buttons/buttons_theme.tres")
+	var _theme: Theme
 	var _theme_type := ""
 	
-	var slider_style = StyleBoxEmpty.new()
-	var grabber_area_style = StyleBoxEmpty.new()
-	var grabber_area_hl_style = StyleBoxEmpty.new()
+	var slider_style = StyleBoxEmpty.new():
+		get: return get_theme_item("style/slider")
+	var grabber_area_style = StyleBoxEmpty.new():
+		get: return get_theme_item("style/grabber_area")
+	var grabber_area_hl_style = StyleBoxEmpty.new():
+		get: return get_theme_item("style/grabber_area_highlight")
 	
-	var grabber_icon = Texture2D.new()
-	var grabber_hl_icon := Texture2D.new()
-	var grabber_disabled_icon := Texture2D.new()
-	var tick_icon := Texture2D.new()
+	var grabber_icon = Texture2D.new():
+		get: return get_theme_item("icon/grabber")
+	var grabber_hl_icon := Texture2D.new():
+		get: return get_theme_item("icon/grabber_highlight")
+	var grabber_disabled_icon := Texture2D.new():
+		get: return get_theme_item("icon/grabber_disabled")
+	var tick_icon := Texture2D.new():
+		get: return get_theme_item("icon/tick")
 	
-	var center_grabber: bool = false
-	var grabber_offset: int = 0
+	var center_grabber: bool = false:
+		get: return get_theme_item("constant/center_grabber")
+	var grabber_offset: int = 0:
+		get: return get_theme_item("constant/grabber_offset")
 	
-	func _get(property):
+	func get_theme_item(property):
 		var theme: Theme
 		if is_instance_valid(_theme):
 			theme = _theme
 		else:
 			theme = preload("res://addons/touch_buttons/buttons_theme.tres")
-		print(property)
-		if property in theme:
-			match property.get_slice("/", 0):
-				"color":
-					return theme.get_color(property.get_slice("/", 1), "TouchHSlider")
-				"constant":
-					return theme.get_constant(property.get_slice("/", 1), "TouchHSlider")
-				"font":
-					return theme.get_font(property.get_slice("/", 1), "TouchHSlider")
-				"font_size":
-					return theme.get_font_size(property.get_slice("/", 1), "TouchHSlider")
-				"icon":
-					return theme.get_icon(property.get_slice("/", 1), "TouchHSlider")
-				"style":
-					return theme.get_stylebox(property.get_slice("/", 1), "TouchHSlider")
+			
+		var item: StringName = property.get_slice("/", 1)
+		var type = _theme_type
+		
+		match property.get_slice("/", 0):
+			"color":
+				if theme.has_color(item, type):
+					return theme.get_color(item, type)
+			"constant":
+				if theme.has_constant(item, type):
+					return theme.get_constant(item, type)
+			"font":
+				if theme.has_font(item, type):
+					return theme.get_font(item, type)
+			"font_size":
+				if theme.has_font_size(item, type):
+					return theme.get_font_size(item, type)
+			"icon":
+				if theme.has_icon(item, type):
+					return theme.get_icon(item, type)
+			"style":
+				if theme.has_stylebox(item, type):
+					return theme.get_stylebox(item, type)
 
 #endregion
 
