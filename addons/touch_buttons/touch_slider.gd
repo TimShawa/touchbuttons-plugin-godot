@@ -15,7 +15,6 @@ var tick_count: int = 0:
 var ticks_on_borders: bool = false:
 	set = set_ticks_on_borders, get = get_ticks_on_borders
 
-
 func _get_property_list():
 	return [
 		{ name = "editable", type = TYPE_BOOL },
@@ -28,14 +27,15 @@ func _get_property_list():
 		{ name = "ticks_on_borders", type = TYPE_BOOL }
 	]
 
-
 var _orientation: Orientation = HORIZONTAL
 var _grab: Grab = Grab.new()
 var _theme_cache: ThemeCache = ThemeCache.new()
-var _theme_type = "TouchSlider":
+var _theme_type: String = "TouchSlider":
 	set(value):
 		_theme_type = value
 		_theme_cache._theme_type = _theme_type
+var _touch_index: int = -1
+var _was_pressed_by_mouse: bool = false
 
 
 #region SETGET
@@ -82,6 +82,9 @@ func _init():
 
 
 func _get_minimum_size():
+	if _theme_type == "TouchSlider":
+		return Vector2i.ZERO
+	
 	var ss: Vector2i = _theme_cache.slider_style.get_minimum_size()
 	var rs: Vector2i = _theme_cache.grabber_icon.get_size()
 	
@@ -95,12 +98,17 @@ func _gui_input(event):
 	if Engine.is_editor_hint():
 		return
 	
+	if event.device == -1:
+		return
+	
 	if !editable:
 		return
 	
+	# Click
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.is_pressed():
+				_was_pressed_by_mouse = true
 				var grabber: Texture2D
 				if get_global_rect().has_point(event.global_position) or has_focus():
 					grabber = _theme_cache.grabber_hl_icon
@@ -126,22 +134,13 @@ func _gui_input(event):
 				_grab.uvalue = get_as_ratio()
 				value_changed.emit()
 				
-			else:
+			elif _was_pressed_by_mouse:
+				_was_pressed_by_mouse = false
 				_grab.active = false
 				var value_changed = !is_equal_approx(float(_grab.value_before_dragging), get_as_ratio())
 				drag_ended.emit(value_changed)
 	
-	if event is InputEventMouseButton:
-		if scrollable:
-			if event.is_pressed() and event.button_index == MOUSE_BUTTON_WHEEL_UP:
-				if focus_mode != FOCUS_NONE:
-					grab_focus()
-				set_value(get_value() + get_step())
-			elif event.is_pressed() and event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-				if focus_mode != FOCUS_NONE:
-					grab_focus()
-				set_value(get_value() - get_step())
-	
+	# Motion
 	if event is InputEventMouseMotion:
 		if _grab.active:
 			var grabber: Texture2D = _theme_cache.grabber_hl_icon
@@ -155,6 +154,70 @@ func _gui_input(event):
 				return
 			var umotion: float = motion / float(areasize)
 			set_as_ratio(_grab.uvalue + umotion)
+	
+	# Touch
+	if event is InputEventScreenTouch:
+		if event.is_pressed():
+			_touch_index = event.index
+			var grabber: Texture2D
+			if get_global_rect().has_point(event.global_position) or has_focus():
+				grabber = _theme_cache.grabber_hl_icon
+			else:
+				grabber = _theme_cache.grabber_icon
+			
+			_grab.pos = event.position.y if _orientation == VERTICAL else event.position.x
+			_grab.value_before_dragging = get_as_ratio()
+			drag_started.emit()
+			
+			var grab_width: float = 0.0 if _theme_cache.center_grabber else float(grabber.get_width())
+			var grab_height: float = 0.0 if _theme_cache.center_grabber else float(grabber.get_height())
+			var max = size.y - grab_height if _orientation == VERTICAL else size.x - grab_width
+			set_block_signals(true)
+			
+			if _orientation == VERTICAL:
+				set_as_ratio(1 - (float(_grab.pos) - (grab_height / 2.0)) / max)
+			else:
+				set_as_ratio((float(_grab.pos) - (grab_width / 2.0)) / max)
+			
+			set_block_signals(false)
+			_grab.active = true
+			_grab.uvalue = get_as_ratio()
+			value_changed.emit()
+			
+		elif !_was_pressed_by_mouse:
+			if event.index == _touch_index:
+				_touch_index = -1
+				_grab.active = false
+				var value_changed = !is_equal_approx(float(_grab.value_before_dragging), get_as_ratio())
+				drag_ended.emit(value_changed)
+	
+	# Drag
+	if event is InputEventScreenDrag:
+		if _grab.active:
+			if !_was_pressed_by_mouse and _touch_index == event.index:
+				var grabber: Texture2D = _theme_cache.grabber_hl_icon
+				var grab_width: float = 0.0 if _theme_cache.center_grabber else float(grabber.get_width())
+				var grab_height: float = 0.0 if _theme_cache.center_grabber else float(grabber.get_height())
+				var motion: float = (event.position.y if _orientation == VERTICAL else event.position.x) - _grab.pos
+				if _orientation == VERTICAL:
+					motion = -motion
+				var areasize: float = size.y - grab_height if _orientation == VERTICAL else size.x - grab_width
+				if areasize <= 0:
+					return
+				var umotion: float = motion / float(areasize)
+				set_as_ratio(_grab.uvalue + umotion)
+	
+	# Mouse wheel scrolling
+	if event is InputEventMouseButton:
+		if scrollable and !_grab.active:
+			if event.is_pressed() and event.button_index == MOUSE_BUTTON_WHEEL_UP:
+				if focus_mode != FOCUS_NONE:
+					grab_focus()
+				set_value(get_value() + get_step())
+			elif event.is_pressed() and event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+				if focus_mode != FOCUS_NONE:
+					grab_focus()
+				set_value(get_value() - get_step())
 
 
 func _notification(what):
