@@ -98,7 +98,7 @@ func _gui_input(event):
 	if Engine.is_editor_hint():
 		return
 	
-	if event.device == -1:
+	if event.device != -1:
 		return
 	
 	if !editable:
@@ -160,7 +160,7 @@ func _gui_input(event):
 		if event.is_pressed():
 			_touch_index = event.index
 			var grabber: Texture2D
-			if get_global_rect().has_point(event.global_position) or has_focus():
+			if get_rect().has_point(event.position) or has_focus():
 				grabber = _theme_cache.grabber_hl_icon
 			else:
 				grabber = _theme_cache.grabber_icon
