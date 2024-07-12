@@ -1,17 +1,28 @@
 @tool
 class_name TouchSlider extends Range
 
+## Base class for multitouch-support sliders meant to be abstract.
+## 
+## Base class for touchscreen sliders (meant to be abstract but it's custom), used to adjust a value by moving a grabber
+## along a horizontal or vertical axis. Sliders are [Range]-based controls.
+## Multitiouch-support enabled, so if there is another pressing finger, the [TouchSlider] will work properly (as it works in one-finger case.[br]
+## [br]
+## [i]Touchscreen equivalent of buiilt-in [Slider].[/i]
 
 signal drag_started()
 signal drag_ended(value_changed: bool)
 
 
+## If [code]true[/code], the slider can be interacted with. If [code]false[/code], the value can be changed only by code.
 var editable: bool = true:
 	set = set_editable, get = is_editable
+## If [code]true[/code], the value can be changed using the mouse wheel.
 var scrollable: bool = true:
 	set = set_scrollable, get = is_scrollable
+## Number of ticks displayed on the slider, including border ticks. Ticks are uniformly-distributed value markers.
 var tick_count: int = 0:
 	set = set_tick_count, get = get_tick_count
+## If [code]true[/code], the slider will display ticks for minimum and maximum values.
 var ticks_on_borders: bool = false:
 	set = set_ticks_on_borders, get = get_ticks_on_borders
 
@@ -85,8 +96,8 @@ func get_ticks_on_borders():
 
 
 func _init():
-	self.focus_mode = Control.FOCUS_ALL
-	self.step = 1.0
+	set_focus_mode(Control.FOCUS_ALL)
+	step = 1.0
 
 
 func _get_minimum_size():
@@ -147,6 +158,7 @@ func _gui_input(event):
 				_grab.active = true
 				_grab.uvalue = get_as_ratio()
 				value_changed.emit()
+				grab_focus()
 				
 			elif _was_pressed_by_mouse:
 				_was_pressed_by_mouse = false
@@ -197,6 +209,7 @@ func _gui_input(event):
 			_grab.active = true
 			_grab.uvalue = get_as_ratio()
 			value_changed.emit()
+			grab_focus()
 			
 		elif !_was_pressed_by_mouse:
 			if event.index == _touch_index:
