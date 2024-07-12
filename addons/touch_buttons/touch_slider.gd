@@ -28,8 +28,16 @@ func _get_property_list():
 	]
 
 var _orientation: Orientation = HORIZONTAL
-var _grab: Grab = Grab.new()
-var _theme_cache: ThemeCache = ThemeCache.new()
+var _grab: Grab = Grab.new():
+	get:
+		if _grab == null:
+			_grab = Grab.new()
+		return _grab
+var _theme_cache: ThemeCache = ThemeCache.new():
+	get:
+		if _theme_cache == null:
+			_theme_cache = ThemeCache.new()
+		return _theme_cache
 var _theme_type: String = "TouchSlider":
 	set(value):
 		_theme_type = value
@@ -94,11 +102,17 @@ func _get_minimum_size():
 		return Vector2i(max(ss.x, rs.x), ss.y)
 
 
+func _set(property, value):
+	if property == "theme_type_variation":
+		_theme_cache._theme_type_variation = value
+	return false
+
+
 func _gui_input(event):
 	if Engine.is_editor_hint():
 		return
 	
-	if event.device != -1:
+	if event.device == -1:
 		return
 	
 	if !editable:
@@ -223,11 +237,10 @@ func _gui_input(event):
 func _notification(what):
 	match what:
 		NOTIFICATION_THEME_CHANGED:
-			if is_instance_valid(theme):
-				_theme_cache._theme = theme
+			_theme_cache._theme = theme
 			update_minimum_size()
 			queue_redraw()
-			
+		
 		NOTIFICATION_MOUSE_ENTER:
 			queue_redraw()
 		
@@ -322,6 +335,7 @@ class Grab extends Resource:
 class ThemeCache extends Resource:
 	var _theme: Theme
 	var _theme_type := ""
+	var _theme_type_variation := ""
 	
 	var slider_style = StyleBoxEmpty.new():
 		get: return get_theme_item("style/slider")
@@ -352,7 +366,7 @@ class ThemeCache extends Resource:
 			theme = preload("res://addons/touch_buttons/buttons_theme.tres")
 			
 		var item: StringName = property.get_slice("/", 1)
-		var type = _theme_type
+		var type = _theme_type if _theme_type_variation.is_empty() else _theme_type_variation
 		
 		match property.get_slice("/", 0):
 			"color":
