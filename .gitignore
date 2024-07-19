@@ -1,3 +1,4 @@
+addons/touch_buttons/demo
 *.tmp
 icon.svg
 icon.svg.import
@@ -24,3 +25,4 @@ export_presets.cfg
 # Mono-specific ignores
 .mono/
 mono_crash.*.json
+control.tscn

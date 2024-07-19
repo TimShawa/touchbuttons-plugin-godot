@@ -5,8 +5,7 @@ class_name TouchButtonGroup extends Resource
 
 ## A group of touchscreen buttons that doesn't allow more than one button to be pressed at a time.
 ## 
-## A group of [TouchBaseButton]-derived buttons. The buttons in a [TouchButtonGroup] are treated like radio buttons: No more than one button can be pressed at a time.
-## Some types of buttons (such as [TouchCheckBox]) may have a special appearance in this state.[br]
+## A group of [TouchBaseButton]-derived buttons. The buttons in a [TouchButtonGroup] are treated like radio buttons: No more than one button can be pressed at a time. Some types of buttons (such as [TouchCheckBox]) may have a special appearance in this state.[br]
 ## [br]
 ## Every member of a [TouchButtonGroup] should have [member press_mode] set to [constant TouchBaseButton.PressMode.MODE_TOGGLE].[br]
 ## [br]

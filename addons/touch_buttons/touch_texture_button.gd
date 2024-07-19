@@ -3,10 +3,9 @@
 class_name TouchTextureButton extends TouchBaseButton
 
 
-## Texture-based touchscreen button. Supports Pressed, and Disabled states.
+## Texture-based touchscreen button. Supports Pressed and Disabled states (also Hover and Hover Press states in mouse mode).
 ## 
-## [TouchTextureButton] has the same functionality as [TouchButton], except it uses sprites instead of Godot's [Theme] resource.
-## It is faster to create, but it doesn't support localization like more complex [Control]s. It also support multitouch input.[br]
+## [TouchTextureButton] has the same functionality as [TouchButton], except it uses sprites instead of Godot's [Theme] resource. It is faster to create, but it doesn't support localization like more complex [Control]s. It also support multitouch input.[br]
 ## [br]
 ## The "normal" state must contain a texture ([member texture_normal]); other textures are optional.[br]
 ## [br]

@@ -1,11 +1,9 @@
 @tool
-class_name TouchSlider extends Range
+class_name TouchSlider extends TouchRange
 
-## Base class for multitouch-support sliders meant to be abstract.
+## Base class for multitouch-support sliders.
 ## 
-## Base class for touchscreen sliders (meant to be abstract but it's custom), used to adjust a value by moving a grabber
-## along a horizontal or vertical axis. Sliders are [Range]-based controls.
-## Multitiouch-support enabled, so if there is another pressing finger, the [TouchSlider] will work properly (as it works in one-finger case.[br]
+## Base class for touchscreen sliders, used to adjust a value by moving a grabber along a horizontal or vertical axis. Sliders are [Range]-based controls. Multitiouch-support enabled, so if there is another pressing finger, the [TouchSlider] will work properly (as it works in one-finger case.[br]
 ## [br]
 ## [i]Touchscreen equivalent of buiilt-in [Slider].[/i]
 
@@ -96,7 +94,7 @@ func get_ticks_on_borders():
 
 
 func _init():
-	set_focus_mode(Control.FOCUS_ALL)
+	_validate_shared()
 	step = 1.0
 
 

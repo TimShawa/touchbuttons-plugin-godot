@@ -9,7 +9,9 @@ class_name TouchHSlider extends TouchSlider
 ## [i]Touchscreen equivalent of buiilt-in [HSlider].[/i]
 
 func _init():
+	_validate_shared()
 	_orientation = HORIZONTAL
 	_theme_type = "TouchHSlider"
 	size_flags_horizontal = 1
 	size_flags_vertical = 0
+	focus_mode = Control.FOCUS_ALL
