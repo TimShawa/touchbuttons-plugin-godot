@@ -116,7 +116,7 @@ There is no [BaseButton.toggle_mode](https://docs.godotengine.org/en/stable/clas
 ## Property Descriptions
 
 
-#### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html#class-bool)  = `false`
+#### [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html#class-bool) disabled = `false`
 > - void **set_disabled ( [bool](https://docs.godotengine.org/en/stable/classes/class_bool.html#class-bool)** value **)**
 > - **[bool](https://docs.godotengine.org/en/stable/classes/class_bool.html#class-bool) is_disabled ( )**
 - If `true`, the button is in disabled state and can't be clicked, hovered or toggled.
