@@ -5,7 +5,7 @@ class_name TouchSlider extends TouchRange
 ## 
 ## Base class for touchscreen sliders, used to adjust a value by moving a grabber along a horizontal or vertical axis. Sliders are [Range]-based controls. Multitiouch-support enabled, so if there is another pressing finger, the [TouchSlider] will work properly (as it works in one-finger case.[br]
 ## [br]
-## [i]Touchscreen equivalent of buiilt-in [Slider].[/i]
+## [i]Touchscreen equivalent of built-in [Slider].[/i]
 
 signal drag_started()
 signal drag_ended(value_changed: bool)
@@ -349,27 +349,27 @@ class ThemeCache extends Resource:
 	var _theme_type_variation := ""
 	
 	var slider_style = StyleBoxEmpty.new():
-		get: return get_theme_item("style/slider")
+		get: return _get_theme_item("style/slider")
 	var grabber_area_style = StyleBoxEmpty.new():
-		get: return get_theme_item("style/grabber_area")
+		get: return _get_theme_item("style/grabber_area")
 	var grabber_area_hl_style = StyleBoxEmpty.new():
-		get: return get_theme_item("style/grabber_area_highlight")
+		get: return _get_theme_item("style/grabber_area_highlight")
 	
 	var grabber_icon = Texture2D.new():
-		get: return get_theme_item("icon/grabber")
+		get: return _get_theme_item("icon/grabber")
 	var grabber_hl_icon := Texture2D.new():
-		get: return get_theme_item("icon/grabber_highlight")
+		get: return _get_theme_item("icon/grabber_highlight")
 	var grabber_disabled_icon := Texture2D.new():
-		get: return get_theme_item("icon/grabber_disabled")
+		get: return _get_theme_item("icon/grabber_disabled")
 	var tick_icon := Texture2D.new():
-		get: return get_theme_item("icon/tick")
+		get: return _get_theme_item("icon/tick")
 	
 	var center_grabber: bool = false:
-		get: return get_theme_item("constant/center_grabber")
+		get: return _get_theme_item("constant/center_grabber")
 	var grabber_offset: int = 0:
-		get: return get_theme_item("constant/grabber_offset")
+		get: return _get_theme_item("constant/grabber_offset")
 	
-	func get_theme_item(property):
+	func _get_theme_item(property):
 		var theme: Theme
 		if is_instance_valid(_theme):
 			theme = _theme

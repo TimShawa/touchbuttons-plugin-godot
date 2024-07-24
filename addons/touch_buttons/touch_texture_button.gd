@@ -37,7 +37,7 @@ var ignore_texture_size := false:
 	set = set_ignore_texture_size, get = get_ignore_texture_size
 
 ## Controls the texture's behavior when you resize the node's bounding rectangle. See the [enum StretchMode] constants for available options.
-var stretch_mode := StretchMode.STRETCH_KEEP:
+var stretch_mode: StretchMode = StretchMode.STRETCH_KEEP:
 	set = set_stretch_mode, get = get_stretch_mode
 
 ## If [code]true[/code], texture is flipped horizontally.

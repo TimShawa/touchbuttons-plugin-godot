@@ -6,7 +6,7 @@ class_name TouchHSlider extends TouchSlider
 ## A horizontal slider with multitouch support, used to adjust a value by moving a grabber along a horizontal axis.
 ## It is a [Range]-based control and goes from left (min) to right (max).[br]
 ## [br]
-## [i]Touchscreen equivalent of buiilt-in [HSlider].[/i]
+## [i]Touchscreen equivalent of built-in [HSlider].[/i]
 
 func _init():
 	_validate_shared()

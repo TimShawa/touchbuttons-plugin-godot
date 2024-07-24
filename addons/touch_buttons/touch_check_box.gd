@@ -11,7 +11,7 @@ class_name ToucCheckBox extends TouchButton
 ## [br]
 ## When [member TouchBaseButton.button_group] specifies a [TouchButtonGroup], [TouchCheckBox] changes its appearance to that of a radio button and uses the various [code]radio_*[/code] theme properties.[br]
 ## [br]
-## [i]Touchscreen equivalent of buiilt-in [CheckBox].[/i]
+## [i]Touchscreen equivalent of built-in [CheckBox].[/i]
 
 func _init(text := ""):
 	super(text)
@@ -44,7 +44,7 @@ func _draw() -> void:
 		item = "radio_" + item
 	if disabled:
 		item += "_disabled"
-	_n_check().texture = get_theme_item("icon", item, _theme_type)
+	_n_check().texture = _get_theme_item("icon", item, _theme_type)
 
 
 func _get_minimum_size() -> Vector2:
@@ -61,6 +61,6 @@ func _get_minimum_size() -> Vector2:
 	size.y = max( size.y - border, _n_check().texture.get_size().y) + border
 	
 	if _n_icon().visible or !text.is_empty():
-		size.x += get_theme_item("constant", "h_separation", _theme_type)
+		size.x += _get_theme_item("constant", "h_separation", _theme_type)
 	
 	return size

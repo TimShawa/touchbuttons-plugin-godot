@@ -6,7 +6,7 @@ class_name TouchRange extends Control
 ## 
 ## TouchRange is a base class for multitouch-supporting controls that represent a number within a range, using a configured [member step] and [member page] size. See [TouchSlider] for example of higher-level node using TouchRange.[br]
 ## [br]
-## [i]Touchscreen equivalent of buiilt-in [Range].[/i]
+## [i]Touchscreen equivalent of built-in [Range].[/i]
 
 
 ## Emitted when [member value] changes. When used on a [TouchSlider], this is called continuously while dragging (potentially every frame). If you are performing an expensive operation in a function connected to [signal value_changed], consider using a [i]debouncing[/i] [Timer] to call the function less often.[br]

@@ -11,7 +11,7 @@ class_name TouchBaseButton extends Control
 ## Click mode is the default button press mode, toggle is switching-state mode
 ## and the pass-by press mode allows the button to press on finger/mouse enter and release on the finger/mouse exit.[br]
 ## [br]
-## [i]Touchscreen equivalent of buiilt-in [BaseButton].[/i]
+## [i]Touchscreen equivalent of built-in [BaseButton].[/i]
 
 ## Emitted when the button starts being held down.
 signal button_down
@@ -24,7 +24,7 @@ signal pressed
 ## Emitted when the button was just toggled between pressed and normal states (will not work in "click" mode). The new state is contained in the [param toggled_on] argument.
 signal toggled(toggled_on: bool)
 ## Emitted when the button forwards recieved [InputEventScreenDrag].
-signal drag_input(event)
+signal drag_input(event: InputEventScreenDrag)
 
 
 enum ActionMode {
@@ -39,7 +39,7 @@ enum PressMode {
 	MODE_CLICK,
 	## The toggle press mode of a button. The button switch the state between pressed or released on any finger touch (or mouse button click).
 	MODE_TOGGLE,
-	## The pass-bypress mode of a button. The pressed and released signals are emitted whenever a pressed finger goes in and out of the button, even if the pressure started outside the active area of the button.
+	## The pass-by press mode of a button. The pressed and released signals are emitted whenever a pressed finger goes in and out of the button, even if the pressure started outside the active area of the button.
 	MODE_PASSBY_PRESS
 }
 
@@ -61,7 +61,7 @@ var disabled := false:
 	set = set_disabled, get = is_disabled
 
 ## Defines how the button reacts on input events. See [enum PressMode] for more information about button press modes.
-var press_mode: int = PressMode.MODE_CLICK:
+var press_mode: PressMode = PressMode.MODE_CLICK:
 	set = set_press_mode, get = get_press_mode
 
 ## If [code]true[/code], the button's state is pressed. If you want to change the pressed state without emitting signals, use [method set_pressed_no_signal].
@@ -69,10 +69,10 @@ var button_pressed := false:
 	set = set_button_pressed, get = is_button_pressed
 
 ## Determines when the button is considered clicked, one of the [enum ActionMode] constants.
-var action_mode: int = ActionMode.ACTION_MODE_BUTTON_RELEASE:
+var action_mode: ActionMode = ActionMode.ACTION_MODE_BUTTON_RELEASE:
 	set = set_action_mode, get = get_action_mode
 
-## If [code]true[/code] and, the button will forward any recieved [InputEventScreenDrag] with [signal drag_input] signal. Works only when [member press_mode] is [constant PressMode.MODE_CLICK]
+## If [code]true[/code], the button will forward any recieved [InputEventScreenDrag] with [signal drag_input] signal. Works only when [member press_mode] is [constant PressMode.MODE_CLICK]
 var pass_screen_drag := false:
 	set = set_pass_screen_drag, get = get_pass_screen_drag
 
@@ -90,7 +90,7 @@ var mouse_enabled := true:
 ## Binary mask to choose which mouse buttons this button will respond to. Makes sense only if [member mouse_enabled] is [code]true[/code].[br]
 ## [br]
 ## To allow both left-click and right-click, use [code]MOUSE_BUTTON_MASK_LEFT | MOUSE_BUTTON_MASK_RIGHT[/code].
-var mouse_button_mask: int = MOUSE_BUTTON_MASK_LEFT:
+var mouse_button_mask: MouseButtonMask = MOUSE_BUTTON_MASK_LEFT:
 	set = set_mouse_button_mask, get = get_mouse_button_mask
 
 
@@ -135,28 +135,36 @@ func set_disabled(value):
 	if disabled and !is_toggle_mode():
 		button_pressed = false
 
+var _pressed_no_signal = false
 
 func set_button_pressed(value):
 	if value:
 		button_pressed = true
-		_emit_pressed()
-		_unpress_group()
+		if !_pressed_no_signal:
+			_emit_pressed()
+			_unpress_group()
 	else:
-		var can_unpress = true
-		if is_toggle_mode() and is_instance_valid(button_group):
-			if !button_group.allow_unpress:
-				can_unpress = false
-				for i: TouchBaseButton in button_group.get_buttons():
-					if i == self:
-						continue
-					if i.is_button_pressed():
-						can_unpress = true
-						break
-		if can_unpress:
+		if !_pressed_no_signal:
+			var can_unpress = true
+			if is_toggle_mode() and is_instance_valid(button_group):
+				if !button_group.allow_unpress:
+					can_unpress = false
+					for i: TouchBaseButton in button_group.get_buttons():
+						if i == self:
+							continue
+						if i.is_button_pressed():
+							can_unpress = true
+							break
+			if can_unpress:
+				button_pressed = false
+				_touch_index = -1
+				_was_pressed_by_mouse = false
+				_emit_released()
+		else:
 			button_pressed = false
 			_touch_index = -1
 			_was_pressed_by_mouse = false
-			_emit_released()
+	_pressed_no_signal = false
 
 
 func set_action_mode(value): action_mode = value
@@ -371,7 +379,7 @@ func _input(event: InputEvent) -> void:
 
 
 ## If button was pressed by touch, returns the touch index, -1 otherwise.
-func get_touch_index():
+func get_touch_index() -> int:
 	return _touch_index
 
 
@@ -398,13 +406,8 @@ func is_hovered() -> bool:
 ## Changes the [member button_pressed] state of the button, without emitting [signal toggled].
 ## Use when you just want to change the state of the button without sending the pressed event (e.g. when initializing scene).
 func set_pressed_no_signal(p_pressed: bool) -> void:
-	if not is_blocking_signals():
-		set_block_signals(true)
-		self.button_pressed = p_pressed
-		_touch_index = -1
-		_was_pressed_by_mouse = false
-		set_block_signals(false)
-	self.button_pressed = p_pressed
+	_pressed_no_signal = true
+	set_button_pressed(p_pressed)
 	_touch_index = -1
 	_was_pressed_by_mouse = false
 

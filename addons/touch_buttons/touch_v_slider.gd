@@ -5,7 +5,7 @@ class_name TouchVSlider extends TouchSlider
 ## 
 ## A vertical slider with multitouch support, used to adjust a value by moving a grabber along a vertical axis. It is a Range-based control and goes from bottom (min) to top (max). Note that this direction is the opposite of VScrollBar's.[br]
 ## [br]
-## [i]Touchscreen equivalent of buiilt-in [VSlider].[/i]
+## [i]Touchscreen equivalent of built-in [VSlider].[/i]
 
 func _init():
 	_validate_shared()

@@ -25,7 +25,7 @@ class_name TouchButton extends TouchBaseButton
 ## To change button appearance attach [Theme] resourse to the node and modify its parameters. Also custom [member theme_type_variation] will be used, if specified.
 ## Theme properties and default values can be found at [code]res://addons/touch_buttons/buttons_theme.tres[/code].[br]
 ## [br]
-## [i]Touchscreen equivalent of buiilt-in [Button].[/i]
+## [i]Touchscreen equivalent of built-in [Button].[/i]
 
 ## The button's text that will be displayed inside the button's area.
 var text := "":
@@ -33,7 +33,7 @@ var text := "":
 
 ## Button's icon, if text is present the icon will be placed before the text.[br]
 ## To edit margin and spacing of the icon, use [theme_item h_separation] theme property and [code]content_margin_*[/code] properties of the used [StyleBox]es.
-var icon: Texture:
+var icon: Texture2D:
 	set = set_icon, get = get_icon
 
 ## Flat buttons don't display decoration.
@@ -43,15 +43,15 @@ var flat := false:
 # Text Behavior
 
 ## Text alignment policy for the button's text, use one of the [enum HorizontalAlignment] constants.
-var alignment: int = HORIZONTAL_ALIGNMENT_CENTER:
+var alignment: HorizontalAlignment = HORIZONTAL_ALIGNMENT_CENTER:
 	set = set_alignment, get = get_alignment
 
 ## Sets the clipping behavior when the text exceeds the node's bounding rectangle. See [enum TextServer.OverrunBehavior] for a description of all modes.
-var text_overrun_behavior: int = TextServer.OVERRUN_NO_TRIMMING:
+var text_overrun_behavior: TextServer.OverrunBehavior = TextServer.OVERRUN_NO_TRIMMING:
 	set = set_text_overrun_behavior, get = get_text_overrun_behavior
 
 ## If set to something other than [constant TextServer.AUTOWRAP_OFF], the text gets wrapped inside the node's bounding rectangle.
-var autowrap_mode: int = TextServer.AUTOWRAP_OFF:
+var autowrap_mode: TextServer.AutowrapMode = TextServer.AUTOWRAP_OFF:
 	set = set_autowrap_mode, get = get_autowrap_mode
 
 ## When this property is enabled, text that is too large to fit the button is clipped, when disabled the [TouchButton] will always be wide enough to hold the text.
@@ -59,24 +59,20 @@ var clip_text := false:
 	set = set_clip_text, get = get_clip_text
 
 # Icon Behavior
-## Specifies if the icon should be aligned horizontally to the left, right, or center of a button.
-## Uses the same [enum HorizontalAlignment] constants as the text alignment.
-## If centered horizontally and vertically, text will draw on top of the icon.
-var icon_alignment := HORIZONTAL_ALIGNMENT_LEFT:
+## Specifies if the icon should be aligned horizontally to the left, right, or center of a button. Uses the same [enum HorizontalAlignment] constants as the text alignment. If centered horizontally and vertically, text will draw on top of the icon.
+var icon_alignment: HorizontalAlignment = HORIZONTAL_ALIGNMENT_LEFT:
 	set = set_icon_alignment, get = get_icon_alignment
 
-## Specifies if the icon should be aligned vertically to the top, bottom, or center of a button.
-## Uses the same [enum VerticalAlignment] constants as the text alignment.
-## If centered horizontally and vertically, text will draw on top of the icon.
-var vertical_icon_alignment := VERTICAL_ALIGNMENT_CENTER:
+## Specifies if the icon should be aligned vertically to the top, bottom, or center of a button. Uses the same [enum VerticalAlignment] constants as the text alignment. If centered horizontally and vertically, text will draw on top of the icon.
+var vertical_icon_alignment: VerticalAlignment = VERTICAL_ALIGNMENT_CENTER:
 	set = set_vertical_icon_alignment, get = get_vertical_icon_alignment
 
 ## When enabled, the button's icon will expand/shrink to fit the button's size while keeping its aspect.
 var expand_icon := false:
-	set = set_expand_icon, get = is_expand_icon # See also [theme_item icon_max_width]. TODO
+	set = set_expand_icon, get = is_expand_icon # See also [theme_item Button.icon_max_width]. TODO
 
 ## Base text writing direction.
-var text_direction := TextServer.DIRECTION_AUTO:
+var text_direction: TextServer.Direction = TextServer.DIRECTION_AUTO:
 	set = set_text_direction, get = get_text_diraction
 
 ## Language code used for line-breaking and text shaping algorithms, if left empty current locale is used instead.
@@ -180,11 +176,11 @@ func _draw() -> void:
 	
 	_n_panel().self_modulate = Color.TRANSPARENT if flat else Color.WHITE
 	
-	_n_hbox().add_theme_constant_override("separation", get_theme_item("constant", "h_separation", _theme_type))
+	_n_hbox().add_theme_constant_override("separation", _get_theme_item("constant", "h_separation", _theme_type))
 	
-	_n_text().add_theme_font_override("font", get_theme_item("font", "font", _theme_type))
-	_n_text().add_theme_color_override("font_outline_color", get_theme_item("color", "font_outline_color", _theme_type))
-	_n_text().add_theme_font_size_override("font_size", get_theme_item("font_size", "font_size", _theme_type))
+	_n_text().add_theme_font_override("font", _get_theme_item("font", "font", _theme_type))
+	_n_text().add_theme_color_override("font_outline_color", _get_theme_item("color", "font_outline_color", _theme_type))
+	_n_text().add_theme_font_size_override("font_size", _get_theme_item("font_size", "font_size", _theme_type))
 	_n_text().text = self.text
 	_n_text().horizontal_alignment = self.alignment
 	_n_text().text_overrun_behavior = self.text_overrun_behavior
@@ -196,9 +192,9 @@ func _draw() -> void:
 	if is_instance_valid(icon):
 		_n_icon().show()
 		_n_icon().texture = self.icon
-	elif has_theme_item("icon", "icon", _theme_type):
+	elif _has_theme_item("icon", "icon", _theme_type):
 		_n_icon().show()
-		_n_icon().texture = get_theme_item("icon", "icon", _theme_type)
+		_n_icon().texture = _get_theme_item("icon", "icon", _theme_type)
 	else:
 		_n_icon().hide()
 	
@@ -218,43 +214,43 @@ func _draw() -> void:
 		_n_icon().stretch_mode = TextureRect.STRETCH_KEEP
 	
 	if has_focus():
-		var style: StyleBox = get_theme_item("stylebox", "focus", _theme_type)
+		var style: StyleBox = _get_theme_item("stylebox", "focus", _theme_type)
 		if is_instance_valid(style):
 			style.draw(get_canvas_item(), Rect2(Vector2.ZERO, size))
 	
 	match get_draw_mode():
 		DrawMode.DRAW_NORMAL:
-			_n_panel().add_theme_stylebox_override("panel", get_theme_item("stylebox", "normal", _theme_type))
-			if has_theme_item("color", "icon_normal_color", _theme_type):
-				_n_icon().self_modulate = get_theme_item("color", "icon_normal_color", _theme_type)
-			_n_text().add_theme_color_override("font_color", get_theme_item("color", "font_color", _theme_type))
+			_n_panel().add_theme_stylebox_override("panel", _get_theme_item("stylebox", "normal", _theme_type))
+			if _has_theme_item("color", "icon_normal_color", _theme_type):
+				_n_icon().self_modulate = _get_theme_item("color", "icon_normal_color", _theme_type)
+			_n_text().add_theme_color_override("font_color", _get_theme_item("color", "font_color", _theme_type))
 		
 		DrawMode.DRAW_PRESSED:
-			_n_panel().add_theme_stylebox_override("panel", get_theme_item("stylebox", "pressed", _theme_type))
-			if has_theme_item("color", "icon_pressed_color", _theme_type):
-				_n_icon().self_modulate = get_theme_item("color", "icon_pressed_color")
-			_n_text().add_theme_color_override("font_color", get_theme_item("color", "font_pressed_color", _theme_type))
+			_n_panel().add_theme_stylebox_override("panel", _get_theme_item("stylebox", "pressed", _theme_type))
+			if _has_theme_item("color", "icon_pressed_color", _theme_type):
+				_n_icon().self_modulate = _get_theme_item("color", "icon_pressed_color")
+			_n_text().add_theme_color_override("font_color", _get_theme_item("color", "font_pressed_color", _theme_type))
 		
 		DrawMode.DRAW_HOVER:
-			_n_panel().add_theme_stylebox_override("panel", get_theme_item("stylebox", "hover", _theme_type))
-			if has_theme_item("color", "icon_pressed_color", _theme_type):
-				_n_icon().self_modulate = get_theme_item("color", "icon_hover_color", _theme_type)
-			_n_text().add_theme_color_override("font_color", get_theme_item("color", "font_hover_color", _theme_type))
+			_n_panel().add_theme_stylebox_override("panel", _get_theme_item("stylebox", "hover", _theme_type))
+			if _has_theme_item("color", "icon_pressed_color", _theme_type):
+				_n_icon().self_modulate = _get_theme_item("color", "icon_hover_color", _theme_type)
+			_n_text().add_theme_color_override("font_color", _get_theme_item("color", "font_hover_color", _theme_type))
 		
 		DrawMode.DRAW_DISABLED:
-			_n_panel().add_theme_stylebox_override("panel", get_theme_item("stylebox", "disabled", _theme_type))
-			if has_theme_item("color", "icon_disabled_color", _theme_type):
-				_n_icon().self_modulate = get_theme_item("color", "icon_disabled_color")
-			_n_text().add_theme_color_override("font_color", get_theme_item("color", "font_disabled_color", _theme_type))
+			_n_panel().add_theme_stylebox_override("panel", _get_theme_item("stylebox", "disabled", _theme_type))
+			if _has_theme_item("color", "icon_disabled_color", _theme_type):
+				_n_icon().self_modulate = _get_theme_item("color", "icon_disabled_color")
+			_n_text().add_theme_color_override("font_color", _get_theme_item("color", "font_disabled_color", _theme_type))
 		
 		DrawMode.DRAW_HOVER_PRESSED:
-			if has_theme_item("stylebox", "hover_pressed", _theme_type):
-				_n_panel().add_theme_stylebox_override("panel", get_theme_item("stylebox", "hover_pressed", _theme_type))
+			if _has_theme_item("stylebox", "hover_pressed", _theme_type):
+				_n_panel().add_theme_stylebox_override("panel", _get_theme_item("stylebox", "hover_pressed", _theme_type))
 			else:
-				_n_panel().add_theme_stylebox_override("panel", get_theme_item("stylebox", "pressed", _theme_type))
-			if has_theme_item("color", "icon_hover_pressed_color", _theme_type):
-				_n_icon().self_modulate = get_theme_item("color", "icon_hover_pressed_color", _theme_type)
-			_n_text().add_theme_color_override("font_color", get_theme_item("color", "font_hover_pressed_color", _theme_type))
+				_n_panel().add_theme_stylebox_override("panel", _get_theme_item("stylebox", "pressed", _theme_type))
+			if _has_theme_item("color", "icon_hover_pressed_color", _theme_type):
+				_n_icon().self_modulate = _get_theme_item("color", "icon_hover_pressed_color", _theme_type)
+			_n_text().add_theme_color_override("font_color", _get_theme_item("color", "font_hover_pressed_color", _theme_type))
 
 
 func _notification(what: int) -> void:
@@ -281,7 +277,7 @@ func _update_controls_size():
 	_n_panel().size = size
 	update_minimum_size()
 	
-	var sep: int = get_theme_item("constant", "h_separation", _theme_type)
+	var sep: int = _get_theme_item("constant", "h_separation", _theme_type)
 	var con_size: Vector2 = _n_control().size
 	
 	if !_n_icon().visible or _n_icon().texture == null:
@@ -363,7 +359,7 @@ func _get_minimum_size() -> Vector2:
 	if !is_node_ready():
 		await ready
 	
-	var separation = get_theme_item("constant", "h_separation", _theme_type)
+	var separation = _get_theme_item("constant", "h_separation", _theme_type)
 	var stylebox: StyleBox = _n_panel().get_theme_stylebox("panel","PanelContainer")
 	var borders := Vector2(
 		stylebox.content_margin_left + stylebox.content_margin_right,
@@ -399,7 +395,7 @@ func _get_minimum_size() -> Vector2:
 	return min_size
 
 
-func get_theme_item(item: StringName, name: StringName, theme_type: StringName = "") -> Variant:
+func _get_theme_item(item: StringName, name: StringName, theme_type: StringName = "") -> Variant:
 	if !theme_type_variation.is_empty():
 		theme_type = theme_type_variation
 	if theme and theme.call("has_%s" % item, name, theme_type):
@@ -416,7 +412,7 @@ func get_theme_item(item: StringName, name: StringName, theme_type: StringName =
 	return null
 
 
-func has_theme_item(item: StringName, name: StringName, theme_type: StringName = "") -> Variant:
+func _has_theme_item(item: StringName, name: StringName, theme_type: StringName = "") -> Variant:
 	if !theme_type_variation.is_empty():
 		theme_type = theme_type_variation
 	if theme and theme.call("has_%s" % item, name, theme_type):
