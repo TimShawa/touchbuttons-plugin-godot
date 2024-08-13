@@ -350,7 +350,7 @@ func _input(event: InputEvent) -> void:
 					if !is_button_pressed() and _has_point(event.position): # ENTER
 						self.button_pressed = true
 						_touch_index = event.index
-					if is_button_pressed() and !_has_point(event.index): # EXIT
+					if is_button_pressed() and !_has_point(event.position): # EXIT
 						if !_was_pressed_by_mouse:
 							if event.index == _touch_index:
 								self.button_pressed = false
